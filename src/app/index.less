@@ -1,0 +1,179 @@
+/**
+ *  Do not remove the comments below. It's the markers used by wiredep to inject
+ *  less dependencies when defined in the bower.json of your dependencies
+ */
+// bower:less
+// endbower
+
+/**
+ *  If you want to override some bootstrap variables, you have to change values here.
+ *  The list of variables are listed here bower_components/bootstrap/less/variables.less
+ */
+@navbar-inverse-link-color: #5AADBB;
+@icon-font-path: '../../bower_components/bootstrap/fonts/';
+@portrait: '../assets/images/AllPortraits.png';
+@zoomlevel: 3;
+@sprite-ff6: '../assets/images/finalfantasy6sheet1.gif';
+@default-gradient: linear-gradient(to bottom, #7878cf 0%,#000233 100%);
+@default-border-gradient: linear-gradient(to bottom, #f2faf5 0%,#555766 100%);
+@font-size: 72%;
+@font-size-calc: (@font-size / @zoomlevel);
+
+@front-row-1-x: 170px;
+@front-row-1-y: 75px;
+@front-row-2-x: 175px;
+@front-row-2-y: 85px;
+@front-row-3-x: 180px;
+@front-row-3-y: 95px;
+@front-row-4-x: 185px;
+@front-row-4-y: 105px;
+@front-row-5-x: 190px;
+@front-row-5-y: 115px;
+
+@back-row-1-x: 195px;
+@back-row-1-y: 75px;
+@back-row-2-x: 200px;
+@back-row-2-y: 85px;
+@back-row-3-x: 205px;
+@back-row-3-y: 95px;
+@back-row-4-x: 210px;
+@back-row-4-y: 105px;
+@back-row-5-x: 215px;
+@back-row-5-y: 115px;
+
+@x-add: 5;
+@y-add: 10;
+
+
+body { 
+	color: #fff !important;
+	text-shadow: 1px 2px #000;
+	font-size: @font-size-calc;
+}
+
+.left { width: 40%; float: left }
+.right {width: 59.62%; float: left; margin-left: .3px }
+
+.browsehappy {
+  margin: 0.2em 0;
+  background: #ccc;
+  color: #000;
+  padding: 0.2em 0;
+}
+
+.thumbnail {
+  height: 200px;
+
+  img.pull-right {
+    width: 50px;
+  }
+}
+
+.front-row-1 { z-index: 2; zoom: @zoomlevel; left: @front-row-1-x; top: @front-row-1-y; }
+.front-row-2 { z-index: 3; zoom: @zoomlevel; left: @front-row-2-x; top: @front-row-2-y; }
+.front-row-3 { z-index: 4; zoom: @zoomlevel; left: @front-row-3-x; top: @front-row-3-y; }
+.front-row-4 { z-index: 5; zoom: @zoomlevel; left: @front-row-4-x; top: @front-row-4-y; }
+.front-row-5 { z-index: 6; zoom: @zoomlevel; left: @front-row-5-x; top: @front-row-5-y; }
+
+.back-row-1 { z-index: 2; zoom: @zoomlevel; left: @back-row-1-x; top: @back-row-1-y; }
+.back-row-2 { z-index: 3; zoom: @zoomlevel; left: @back-row-2-x; top: @back-row-2-y; }
+.back-row-3 { z-index: 4; zoom: @zoomlevel; left: @back-row-3-x; top: @back-row-3-y; }
+.back-row-4 { z-index: 5; zoom: @zoomlevel; left: @back-row-4-x; top: @back-row-4-y; }
+.back-row-5 { z-index: 6; zoom: @zoomlevel; left: @back-row-5-x; top: @back-row-5-y; }
+
+
+.playarea { 
+	width: 240px;
+	height: 147px;
+	background: url(../assets/images/bgs.png) 256px 1352px; 
+	zoom: @zoomlevel;
+	z-index: 1;
+	position: absolute;
+}
+
+.boss { 
+	width: 147px;
+	height: 147px;
+	background: url(../assets/images/bosses.png) -402px 425px;
+	zoom: @zoomlevel;
+	z-index: 2;
+	position: absolute;
+}
+
+.portrait { width: 33px; height: 33px;float: left; margin: 20px; }
+
+.status {
+	.init { background: url(../assets/images/init.png); background-size: 0% .7px; background-repeat: no-repeat; border-radius: 1px; border: .3px solid; border-color: #dedede; height: 1.3px; float: right; width: 33%; margin-left: 2px; margin-top: .85px; background-color: #FFF } 
+	span { float: right; }
+}
+
+#gui-bg {
+	width: 240px;
+	height: 60px;
+	position: absolute;
+	top: 147px;
+	background-color: black;
+	zoom: @zoomlevel;
+	padding: 1px;
+}
+
+#gui {	
+	background: @default-gradient;	
+	zoom: @zoomlevel;
+	border-radius: 1px;
+	border: .3px solid;
+	border-color: @default-border-gradient;
+	padding: 1px;
+	height: 100%;
+}
+
+.character-sprite-ff6 { width: 20px; height: 25px; position: absolute; }
+
+@magus:'../assets/images/magus.png';
+.magus {
+	position: absolute;
+	&.ready_frame1 { background: url(@magus) 455px 360px; width: 30px; height: 35px; left: (@back-row-4-x - 8); top: (@back-row-4-y - 5)}
+	&.ready_frame2 { background: url(@magus) 487px 361px; width: 30px; height: 35px; left: (@back-row-4-x - 8); top: (@back-row-4-y - 5)}
+}
+
+.selected::before { content: "› "}
+
+.celes { background: url(@sprite-ff6) 200px 813px; }
+.shadow { background: url(@sprite-ff6) 396px 1068px; }
+.mog { background: url(@sprite-ff6) 612px 493px }
+.edgar { background: url(@sprite-ff6) 607px 1063px; }
+.setzer { background: url(@sprite-ff6) 427px 646px; }
+
+
+.knight { background: url(@portrait) 997px 0px;  }
+.dragoon { background: url(@portrait) 964px 0px;  }
+.runeknight { background: url(@portrait) 352px 0px;  }
+.paladin { background: url(@portrait) 640px 0px;  }
+.avenger { background: url(@portrait) 281px 0px;  }
+.thief { background: url(@portrait) 456px 0px;  }
+.pugilist { background: url(@portrait) 387px 0px;  }
+.ninja { background: url(@portrait) 568px 0px;  }
+.swashbuckler { background: url(@portrait) 174px 0px;  }
+.bountyhunter{ background: url(@portrait) 316px 0px;  }
+.arcanist { background: url(@portrait) 820px 0px;  }
+.mechanic { background: url(@portrait) 891px 0px;  }
+.mystic { background: url(@portrait) 33px 0px;  }
+.twinmage { background: url(@portrait) 712px 0px;  }
+.summoner { background: url(@portrait) 605px 0px;  }
+.cleric { background: url(@portrait) 928px 0px;  }
+.monk { background: url(@portrait) 749px 0px;  }
+.commander { background: url(@portrait) 422px 0px;  }
+.bard { background: url(@portrait) 784px 0px;  }
+.artist { background: url(@portrait) 140px 0px;  }
+.esper { background: url(@portrait) 496px 0px;  }
+.force { background: url(@portrait) 66px 0px;  }
+.wildling { background: url(@portrait) 212px 0px;  }
+.spellweaver { background: url(@portrait) 531px 0px;  }
+.moogle { background: url(@portrait) 247px 0px;  }
+
+/**
+ *  Do not remove the comments below. It's the markers used by gulp-inject to inject
+ *  all your less files automatically
+ */
+// injector
+// endinjector
