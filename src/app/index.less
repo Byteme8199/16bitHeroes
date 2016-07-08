@@ -12,164 +12,261 @@
 @navbar-inverse-link-color: #5AADBB;
 @icon-font-path: '../../bower_components/bootstrap/fonts/';
 @portrait: '../assets/images/AllPortraits.png';
-@zoomlevel: 3;
-@sprite-ff6: '../assets/images/finalfantasy6sheet1.gif';
+@sprite-ff6: '../assets/images/finalfantasy6sheet1.png';
+@sprite-ff4: '../assets/images/ff4sprites.png';
 @default-gradient: linear-gradient(to bottom, #7878cf 0%,#000233 100%);
+@overlay-gradient: linear-gradient(to bottom, rgba(0,0,0,0) 0%,rgba(0,2,51,0.45) 100%);
+@overlay-gradient-reverse: linear-gradient(to top, rgba(0,0,0,0) 0%,rgba(0,2,51,0.45) 100%);
+@overlay-gradient-vert: linear-gradient(to right, rgba(0,0,0,0) 0%,rgba(0,2,51,0.45) 100%);
+
 @default-border-gradient: linear-gradient(to bottom, #f2faf5 0%,#555766 100%);
-@font-size: 72%;
-@font-size-calc: (@font-size / @zoomlevel);
-
-@front-row-1-x: 170px;
-@front-row-1-y: 75px;
-@front-row-2-x: 175px;
-@front-row-2-y: 85px;
-@front-row-3-x: 180px;
-@front-row-3-y: 95px;
-@front-row-4-x: 185px;
-@front-row-4-y: 105px;
-@front-row-5-x: 190px;
-@front-row-5-y: 115px;
-
-@back-row-1-x: 195px;
-@back-row-1-y: 75px;
-@back-row-2-x: 200px;
-@back-row-2-y: 85px;
-@back-row-3-x: 205px;
-@back-row-3-y: 95px;
-@back-row-4-x: 210px;
-@back-row-4-y: 105px;
-@back-row-5-x: 215px;
-@back-row-5-y: 115px;
-
-@x-add: 5;
-@y-add: 10;
-
 
 body { 
+	background-color: black;
+	padding: 25% auto;
 	color: #fff !important;
 	text-shadow: 1px 2px #000;
-	font-size: @font-size-calc;
+	font-size: 24px;
 }
 
 .left { width: 40%; float: left }
-.right {width: 59.62%; float: left; margin-left: .3px }
+.right { width: 59.6%; float: left; margin-left: 3px }
 
-.browsehappy {
-  margin: 0.2em 0;
-  background: #ccc;
-  color: #000;
-  padding: 0.2em 0;
-}
+.inputarea { width: 37%; position: absolute; left: 15px;  }
 
-.thumbnail {
-  height: 200px;
+#playarea { width: 960px; height: 826px; overflow: hidden; background: @default-gradient }
 
-  img.pull-right {
-    width: 50px;
-  }
-}
-
-.front-row-1 { z-index: 2; zoom: @zoomlevel; left: @front-row-1-x; top: @front-row-1-y; }
-.front-row-2 { z-index: 3; zoom: @zoomlevel; left: @front-row-2-x; top: @front-row-2-y; }
-.front-row-3 { z-index: 4; zoom: @zoomlevel; left: @front-row-3-x; top: @front-row-3-y; }
-.front-row-4 { z-index: 5; zoom: @zoomlevel; left: @front-row-4-x; top: @front-row-4-y; }
-.front-row-5 { z-index: 6; zoom: @zoomlevel; left: @front-row-5-x; top: @front-row-5-y; }
-
-.back-row-1 { z-index: 2; zoom: @zoomlevel; left: @back-row-1-x; top: @back-row-1-y; }
-.back-row-2 { z-index: 3; zoom: @zoomlevel; left: @back-row-2-x; top: @back-row-2-y; }
-.back-row-3 { z-index: 4; zoom: @zoomlevel; left: @back-row-3-x; top: @back-row-3-y; }
-.back-row-4 { z-index: 5; zoom: @zoomlevel; left: @back-row-4-x; top: @back-row-4-y; }
-.back-row-5 { z-index: 6; zoom: @zoomlevel; left: @back-row-5-x; top: @back-row-5-y; }
-
-
-.playarea { 
-	width: 240px;
-	height: 147px;
-	background: url(../assets/images/bgs.png) 256px 1352px; 
-	zoom: @zoomlevel;
+.bg { 
+	width: 960px;
+	height: 588px;
+	top: 0px;
+	left: 0px;
+	/* background: url(../assets/images/bgs1.png) -64px -64px; */
+	background: url(../assets/images/stage.png);
 	z-index: 1;
 	position: absolute;
 }
 
-.boss { 
-	width: 147px;
-	height: 147px;
-	background: url(../assets/images/bosses.png) -402px 425px;
-	zoom: @zoomlevel;
-	z-index: 2;
+.pointer {
 	position: absolute;
+    z-index: 5;
+    left: -200px;
+    top: -400px;
+    transform: scaleX(-1);
 }
 
-.portrait { width: 33px; height: 33px;float: left; margin: 20px; }
+.boss { 
+    z-index: 2;
+    position: absolute;
+}
+
+.portrait { width: 112px; height: 96px; float: left; margin: 20px; }
+.thin-portrait { float: left; }
+.thin-portrait div { width: 120px; height: 400px; margin: 0px 5px; border-radius: 10px; }
+.thin-portrait .disabled { filter: grayscale(100%); }
+.grey { filter: grayscale(100%) !important; }
+.thin-portrait div:hover { border: 3px solid; border-color: @default-border-gradient; }
+
+.gameSelect { overflow: hidden; height: 410px; padding: 0px 10px 10px 40px; }
+.gameSelect strong { position: absolute; font-size: 30px; -webkit-text-stroke: 1px black; padding-left: 15px; }
+.gameSelect span { position: relative;
+    font-size: 20px;
+    top: 370px;
+    width: 120px;
+    text-align: right;
+    display: block;
+    padding-right: 7px;
+    -webkit-text-stroke: .5px black;
+    font-weight: bold; 
+}
+
+#selectArea { padding-top: 50px; 
+	h1 { position: absolute; top: 10px; left: 10px; font-size: 32px; margin: 0px; };
+}
+#selectAreaOverlay { background: @overlay-gradient; width: 960px; height: 160px; position: fixed; top: 460px; left: 0px; z-index: 3 }
+
+#topAreaOverlay { background: @overlay-gradient-reverse; width: 960px; height: 40px; position: fixed; top: 0px; left: 0px; z-index: 3 }
+
+#sideOverlay { background: @overlay-gradient-vert; width: 50px; height: 826px; position: fixed; top: 0px; left: 910px; z-index: 2 }
+
+
+#teamOverlay { z-index: 4; position: absolute; top: 620px; left: 0px; width: 960px; height: 207px; background-color: rgba(0,0,0,.75); padding: 25px; }
+
+#teamOverlay .portrait { width: 112px; height: 96px; margin: 25px; float: left; background-color: #fff; border-radius: 5px; box-shadow: 3px 3px 5px #000;  }
+
+#teamOverlay .control { float: right; margin: 40px 20px; }
+
+.fa-check { color: green; font-size: 60px; }
+.fa-times { color: red; font-size: 60px; }
+
+#teamOverlay .portrait:hover { border: 1.5px solid; border-color: @default-border-gradient; }
+
+#teamOverlay .fa-check:hover { color: white !important }
+
+#sideAreaOverlayLeft { position: absolute; top: 240px; left: 900px; font-size: 40px; z-index: 10;}
+#sideAreaOverlayRight { position: absolute; top: 180px; left: 900px; font-size: 40px; z-index: 10;}
+#submitTeam span { font-size: 12px; color: black }
+
+:focus { outline-width: 0px !important} 
 
 .status {
-	.init { background: url(../assets/images/init.png); background-size: 0% .7px; background-repeat: no-repeat; border-radius: 1px; border: .3px solid; border-color: #dedede; height: 1.3px; float: right; width: 33%; margin-left: 2px; margin-top: .85px; background-color: #FFF } 
+	.init {     
+		background: url(../assets/images/init.png);
+	    background-size: 1% 10px;
+	    background-repeat: no-repeat;
+	    border-radius: 8px;
+	    border: 1px solid;
+	    border-color: #dedede;
+	    height: 13px;
+	    float: right;
+	    width: 33%;
+	    margin-left: 15px;
+	    margin-top: 10px;
+	    background-color: #FFF; 
+    } 
 	span { float: right; }
 }
 
 #gui-bg {
-	width: 240px;
-	height: 60px;
+	width: 960px;
+	height: 240px;
 	position: absolute;
-	top: 147px;
+	top: 588px;
 	background-color: black;
-	zoom: @zoomlevel;
 	padding: 1px;
 }
 
 #gui {	
 	background: @default-gradient;	
-	zoom: @zoomlevel;
-	border-radius: 1px;
-	border: .3px solid;
+	border-radius: 8px;
+	border: 3px solid;
 	border-color: @default-border-gradient;
-	padding: 1px;
+	padding: 10px;
 	height: 100%;
 }
 
-.character-sprite-ff6 { width: 20px; height: 25px; position: absolute; }
-
-@magus:'../assets/images/magus.png';
-.magus {
-	position: absolute;
-	&.ready_frame1 { background: url(@magus) 455px 360px; width: 30px; height: 35px; left: (@back-row-4-x - 8); top: (@back-row-4-y - 5)}
-	&.ready_frame2 { background: url(@magus) 487px 361px; width: 30px; height: 35px; left: (@back-row-4-x - 8); top: (@back-row-4-y - 5)}
+#statusHolder {  
+	border-radius: 8px;
+	border: 3px solid;
+	border-color: @default-border-gradient;
+	padding: 1px;
+	height: 99%;
+	margin: 2px; 
+	width: 70%;
+	float: left;
 }
 
-.selected::before { content: "› "}
+#optionsHolder {  
+	border-radius: 8px;
+	border: 3px solid;
+	border-color: @default-border-gradient;
+	padding: 1px;
+	height: 99%;
+	margin: 2px; 
+	width: 26%;
+	float: left;
+}
 
-.celes { background: url(@sprite-ff6) 200px 813px; }
-.shadow { background: url(@sprite-ff6) 396px 1068px; }
-.mog { background: url(@sprite-ff6) 612px 493px }
-.edgar { background: url(@sprite-ff6) 607px 1063px; }
-.setzer { background: url(@sprite-ff6) 427px 646px; }
+.status { margin-bottom: 10px }
 
 
-.knight { background: url(@portrait) 997px 0px;  }
-.dragoon { background: url(@portrait) 964px 0px;  }
-.runeknight { background: url(@portrait) 352px 0px;  }
-.paladin { background: url(@portrait) 640px 0px;  }
-.avenger { background: url(@portrait) 281px 0px;  }
-.thief { background: url(@portrait) 456px 0px;  }
-.pugilist { background: url(@portrait) 387px 0px;  }
-.ninja { background: url(@portrait) 568px 0px;  }
-.swashbuckler { background: url(@portrait) 174px 0px;  }
-.bountyhunter{ background: url(@portrait) 316px 0px;  }
-.arcanist { background: url(@portrait) 820px 0px;  }
-.mechanic { background: url(@portrait) 891px 0px;  }
-.mystic { background: url(@portrait) 33px 0px;  }
-.twinmage { background: url(@portrait) 712px 0px;  }
-.summoner { background: url(@portrait) 605px 0px;  }
-.cleric { background: url(@portrait) 928px 0px;  }
-.monk { background: url(@portrait) 749px 0px;  }
-.commander { background: url(@portrait) 422px 0px;  }
-.bard { background: url(@portrait) 784px 0px;  }
-.artist { background: url(@portrait) 140px 0px;  }
-.esper { background: url(@portrait) 496px 0px;  }
-.force { background: url(@portrait) 66px 0px;  }
-.wildling { background: url(@portrait) 212px 0px;  }
-.spellweaver { background: url(@portrait) 531px 0px;  }
-.moogle { background: url(@portrait) 247px 0px;  }
+#PartyScreen { padding: 5px }
+.statusBlock { width: 100%; padding: 10px; } 
+.statusBlock .status_portrait { width: 112px; height: 96px; float:left; }
+.statusBlock strong { font-size: 20px; text-transform: uppercase;}
+.statusBlock .stat { font-size: 20px; }
+.statusBlock .stat span { color: aqua; }
+.statusBlock .back { margin: 0px 30px 0px 40px; }
+.statusBlock .front { margin: 0px 70px 0px 0px; }
+.clear { clear: both }
+
+
+#selectedCharacter { color: white; top: -1000px; z-index: 29; position: absolute; left: 0px; font-size: 40px; }
+#commands div:hover div::before { content: "› "}
+
+.shownAction { position: absolute; top: 40px; left: 20px; width: 84%; border-radius: 8px;
+	border: 3px solid;
+	border-color: @default-border-gradient;
+	padding: 20px;
+	float: left;
+	background: @default-gradient;
+	color: White;
+	z-index: 10;
+}
+
+
+.Cecil { background: url(@sprite-ff4) 2385px 3952px; width: 73px; height: 100px; position: absolute; }
+.Rosa { background: url(@sprite-ff4) 2385px 3148px; width: 73px; height: 100px; position: absolute; }
+.Rydia { background: url(@sprite-ff4) 2385px 3500px; width: 73px; height: 100px; position: absolute; }
+.Cid { background: url(@sprite-ff4) 2385px 2692px; width: 73px; height: 100px; position: absolute; }
+.Edge { background: url(@sprite-ff4) 2385px 2576px; width: 73px; height: 100px; position: absolute; }
+.Edward { background: url(@sprite-ff4) 2385px 3268px; width: 73px; height: 100px; position: absolute; }
+.FuSoYa { background: url(@sprite-ff4) 1785px 2452px; width: 73px; height: 100px; position: absolute; }
+.Golbez { background: url(@sprite-ff4) 2385px 2340px; width: 73px; height: 100px; position: absolute; }
+.Kain { background: url(@sprite-ff4) 2385px 3728px; width: 73px; height: 100px; position: absolute; }
+.PalomPorom { background: url(@sprite-ff4) 2385px 2868px; width: 120px; height: 160px; position: absolute; }
+.Tellah { background: url(@sprite-ff4) 2385px 3392px; width: 73px; height: 100px; position: absolute; }
+.Yang { background: url(@sprite-ff4) 2385px 3032px; width: 73px; height: 100px; position: absolute; }
+
+
+.Banon { background: url(@sprite-ff6) 320px 1950px; width: 80px; height: 100px; position: absolute; }
+.Celes { background: url(@sprite-ff6) 369px 3444px; width: 80px; height: 100px; position: absolute; }
+.Cyan { background: url(@sprite-ff6) 1980px 3418px; width: 80px; height: 100px; position: absolute; }
+.Edgar { background: url(@sprite-ff6) 1988px 4210px; width: 80px; height: 100px; position: absolute; }
+.Gau { background: url(@sprite-ff6) 460px 2650px; width: 80px; height: 100px; position: absolute; }
+.GoGo { background: url(@sprite-ff6) 2820px 1934px; width: 80px; height: 100px; position: absolute; }
+.Kefka { background: url(@sprite-ff6) 1263px 1236px; width: 80px; height: 100px; position: absolute; }
+.Leo { background: url(@sprite-ff6) 2033px 4836px; width: 80px; height: 100px; position: absolute; }
+.Locke { background: url(@sprite-ff6) 2820px 4214px; width: 80px; height: 100px; position: absolute; }
+.Mog { background: url(@sprite-ff6) 2024px 1927px; width: 80px; height: 100px; position: absolute; }
+.Relm { background: url(@sprite-ff6) 8443px 2631px; width: 80px; height: 100px; position: absolute; }
+.Sabin { background: url(@sprite-ff6) 4347px 3435px; width: 80px; height: 100px; position: absolute; }
+.Setzer { background: url(@sprite-ff6) 4468px 2656px; width: 80px; height: 100px; position: absolute; }
+.Shadow { background: url(@sprite-ff6) 1172px 4230px; width: 80px; height: 100px; position: absolute; }
+.Strago { background: url(@sprite-ff6) 2836px 2650px; width: 80px; height: 100px; position: absolute; }
+.Terra { background: url(@sprite-ff6) 3587px -137px; width: 80px; height: 100px; position: absolute; }
+.Umaro { background: url(@sprite-ff6) 4331px 1935px; width: 80px; height: 100px; position: absolute; }
+
+
+.Crono { background: url('../assets/images/CronoSprites.png') 1772px 2720px; width: 88px; height: 140px; position: absolute;  }
+.Frog { background: url('../assets/images/FrogSprites.png') 1160px 2708px; width: 100px; height: 120px; position: absolute; transform: scaleX(-1); }
+.Lucca { background: url('../assets/images/LuccaSprites.png') 1448px 3016px; width: 88px; height: 140px; position: absolute; transform: scaleX(-1); }
+
+
+@keyframes deathBlow {
+    0%  {margin-left: -1px; opacity: 1; css-webkit-filter: hue-rotate(0deg);}
+    5%  {margin-left: 1px;}
+    10% {margin-left: -1px;}
+    15% {margin-left: 1px;}
+    20% {margin-left: -1px;}
+    25% {margin-left: 1px;}
+    30% {margin-left: -1px;}
+    35% {margin-left: 1px;}
+    40% {margin-left: -1px;}
+    45% {margin-left: 1px;}
+    50% {margin-left: -1px;}
+    55% {margin-left: 1px;}
+    60% {margin-left: -1px;}
+    65% {margin-left: 1px;}
+    70% {margin-left: -1px;}
+    75% {margin-left: 1px;}
+    80% {margin-left: -1px;}
+    85% {margin-left: 1px;}
+    90% {margin-left: -1px;}
+    95% {margin-left: 1px; }
+    100%{margin-left: -100000px; opacity: 0; css-webkit-filter: hue-rotate(180deg);}
+}
+
+.deathBlow { animation-name: deathBlow; animation-duration: 4s; animation-fill-mode: forwards; }
+
+
+@keyframes castingFuSoYa {
+	100% { background-position-x: 1858px }
+}
+
+.castingFuSoYa { animation: castingFuSoYa .8s steps(2) infinite; }
+
+
 
 /**
  *  Do not remove the comments below. It's the markers used by gulp-inject to inject

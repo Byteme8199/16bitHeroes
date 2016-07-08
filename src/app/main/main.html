@@ -1,37 +1,139 @@
-<script src="/horizon/horizon.js"></script>
+<!--<script src="/horizon/horizon.js"></script>-->
 
 
-<div class="playarea"></div>
+<div id="playarea">
 
-<div class="boss"></div>
 
-<div class="front-row-1 character-sprite-ff6 mog"></div>
-<div class="front-row-2"></div>
-<div class="front-row-3 character-sprite-ff6 shadow"></div>
-<div class="front-row-4"></div>
-<div class="front-row-5 character-sprite-ff6 edgar"></div>
+  <div id="selectArea" ng-show="showSelect">
 
-<div class="back-row-1"></div>
-<div class="back-row-2 character-sprite-ff6 setzer"></div>
-<div class="back-row-3"></div>
-<div class="back-row-4 magus ready_frame1 "></div>
-<div class="back-row-5"></div>
+    <h1>Choose your party</h1>
 
-<div id="gui-bg">
-  <div id="gui" class="left">
-    <div id="commands">
-      <div ng-repeat="command in commands">
-        <div id="command-{{ $index + 1 }}" class="command" ng-click="runCommand(command)">{{command}}</div>
+    <div id="topAreaOverlay" ng-click="changeGame(currentGameID - 1)"></div>
+
+    <div id="sideAreaOverlayLeft"  ng-click="changeCharacterSlot(currentSlotID - 1)"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></div>
+    <div id="sideAreaOverlayRight" ng-click="changeCharacterSlot(currentSlotID + 1)"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></div>
+
+    <div id="sideOverlay"></div>
+
+    <div id="gameSelectHolder">
+      <div ng-repeat="game in roster" class="gameSelect" style="width: {{ 150 * game.roster.length }}px">
+        <div ng-repeat="char in game.roster | orderBy:'locked'" ng-class="{ 'grey': currentGame != game.name  }" class="thin-portrait" >
+          <div style="background: url('assets/images/{{ char.name }}.jpg') 40% 20%" id="{{ char.name }}-portrait" ng-class="{ 'disabled': char.locked }" ng-click="addChar(char.name, char.locked)">
+            <span>{{ char.name }}</span>
+          </div>
+        </div>
       </div>
     </div>
+
+    <div id="selectAreaOverlay" ng-click="changeGame(currentGameID + 1)"></div>
+
+    <div id="teamOverlay">
+      <div class="portrait" ng-repeat="char in team" class="selectedCharacters" ng-click="removeChar($index)" style="background: url('assets/images/{{ char.name }}_small.png') 40% 20%" id="{{ char.name }}-small">
+      </div>
+      <div class="control" id="submitTeam" ng-click="loadCharacters()">
+        <span ng-show="team.length < 5"><i class="fa fa-times" aria-hidden="true"></i></span>
+        <span ng-show="team.length == 5"><i class="fa fa-check" aria-hidden="true"></i></span>
+      </div>
+    </div>
+
   </div>
-  <div id="gui" class="right">
-    <div class="char1 status">{{ char1.name }} <div class="init"></div> <span>{{ char1.hp }} / {{ char1.hptotal}}</span></div>
-    <div class="char2 status">{{ char2.name }} <div class="init"></div> <span>{{ char2.hp }} / {{ char2.hptotal}}</span> </div>
-    <div class="char3 status">{{ char3.name }} <div class="init"></div> <span>{{ char3.hp }} / {{ char3.hptotal}}</span></div>
-    <div class="char4 status">{{ char4.name }} <div class="init"></div> <span>{{ char4.hp }} / {{ char4.hptotal}}</span></div>
-    <div class="char5 status">{{ char5.name }} <div class="init"></div> <span>{{ char5.hp }} / {{ char5.hptotal}}</span></div>
+
+
+
+
+
+  <div id="PartyScreen" ng-show="showParty">
+
+    <div id="statusHolder">
+      <div ng-repeat="char in team">
+        <div class="statusBlock">
+          <img class="status_portrait" ng-class="char.position" ng-click="changePosition(char)" ng-src="assets/images/{{ char.name}}_small.png">
+          <strong>{{ char.name }}</strong> 
+          <div class="stat"><span>LV</span> {{ char.level }}</div>
+          <div class="stat"><span>HP</span> {{ char.hp }} / {{ char.hptotal }}</div>
+          <div class="stat"><span>MP</span> {{ char.hp }} / {{ char.mptotal }}</div>
+          <div class="clear"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="optionsHolder">
+      <div ng-click="switchViews('battle')" ng-show="goodColumns">Next</div>
+    </div>
+
   </div>
+
+
+
+
+
+  <div id="BattleScreen" ng-show="showBattle">
+
+
+
+    <div class="bg"></div>
+
+    <div class="shownAction" ng-show="showAction">{{ shownAction }}</div>
+
+    <div ng-repeat="enemy in enemyForce track by enemy.num">
+      <div class="boss" id="{{ enemy.name }}{{ $index }}" ng-mouseover="movePointer()" ng-mouseout="removePointer()" ng-click="selectTarget('enemy', 'enemy', $index)" style="background: url('{{ enemy.image }}') {{ enemy.offsetx }}px {{ enemy.offsety }}px; width: {{ enemy.width }}px; height: {{ enemy.height }}px; top: {{ enemy.spacingy }}px; left: {{ enemy.spacingx }}px"></div>
+    </div>
+
+
+
+    <div ng-if="frontrow.length === 3" class="front-row">
+      <div ng-repeat="char in frontrow" id="{{ char.name }}" ng-mouseover="movePointer()" ng-mouseout="removePointer()" ng-click="selectTarget('ally', 'front', $index)" ng-style="{'left': 680 + ($index * 40), 'top': (280 - char.pixelheight) + ($index * 80), 'z-index': ($index + 1)}" ng-class="char.name" class="character"></div>
+    </div>
+
+        <div ng-if="frontrow.length === 2" class="front-row">
+          <div ng-repeat="char in frontrow" id="{{ char.name }}" ng-mouseover="movePointer()" ng-mouseout="removePointer()" ng-click="selectTarget('ally', 'front', $index)" ng-style="{'left': 700 + ($index * 40), 'top': (310 - char.pixelheight) + ($index * 80), 'z-index': ($index + 1)}" ng-class="char.name" class="character"></div>
+        </div>
+
+
+
+    <div ng-if="backrow.length === 3" class="back-row">
+      <div ng-repeat="char in backrow" id="{{ char.name }}" ng-mouseover="movePointer()" ng-mouseout="removePointer()" ng-click="selectTarget('ally', 'back', $index)" ng-style="{'left': 780 + ($index * 40), 'top': (280 - char.pixelheight) + ($index * 80), 'z-index': ($index + 1)}" ng-class="char.name" class="character"></div>
+    </div>
+
+        <div ng-if="backrow.length === 2" class="back-row">
+          <div ng-repeat="char in backrow" id="{{ char.name }}" ng-mouseover="movePointer()" ng-mouseout="removePointer()" ng-click="selectTarget('ally', 'back', $index)" ng-style="{'left': 800 + ($index * 40), 'top': (310 - char.pixelheight) + ($index * 80), 'z-index': ($index + 1)}" ng-class="char.name" class="character"></div>
+        </div>
+
+
+
+    <div id="gui-bg">
+
+      <div id="gui" class="left">
+        <div ng-repeat="enemy in enemyForce" class="status">{{ enemy.name }}</div>
+      </div>
+
+      <div id="gui" class="left inputarea" ng-show="inputting">
+        <div id="commands">
+          <div ng-repeat="command in commands">
+            <div class="command" ng-click="runCommand(command)">{{command}}</div>
+          </div>
+          <div ng-repeat="spell in magicList">
+            <div class="command" ng-click="selectMagic(spell)"><i class="fa fa-circle" style="color: {{spell.class}}"></i> {{spell.name}}</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="gui" class="right">
+        <div ng-repeat="char in team" class="status {{ char.name }}_status"><strong>{{ char.name }}</strong> <div class="init"></div> <span>{{ char.hp }} / {{ char.hptotal}}</span></div>
+      </div>
+    </div>
+
+
+
+    <i id="selectedCharacter" class="fa fa-caret-down"></i>
+    <i id="targetedCharacter" class="pointer"><img src="assets/images/hand-big.png"></i>
+
+  </div>
+
+
+
+
+
+
+
 </div>
-
-
