@@ -107,13 +107,13 @@
         <div ng-repeat="enemy in enemyForce" class="status">{{ enemy.name }}</div>
       </div>
 
-      <div id="gui" class="left inputarea" ng-show="inputting">
+      <div id="gui" class="left inputarea" ng-show="inputting && !clearInputs">
         <div id="commands">
           <div ng-repeat="command in commands">
             <div class="command" ng-click="runCommand(command)">{{command}}</div>
           </div>
-          <div ng-repeat="spell in magicList">
-            <div class="command" ng-click="selectMagic(spell)"><i class="fa fa-circle" style="color: {{spell.class}}"></i> {{spell.name}}</div>
+          <div ng-repeat="action in subActionList">
+            <div class="command" ng-click="selectSubAction(action)"><i class="fa fa-circle" style="color: {{action.class}}"></i> {{action.name}}</div>
           </div>
         </div>
       </div>

@@ -201,7 +201,7 @@ body {
 .Cid { background: url(@sprite-ff4) 2385px 2692px; width: 73px; height: 100px; position: absolute; }
 .Edge { background: url(@sprite-ff4) 2385px 2576px; width: 73px; height: 100px; position: absolute; }
 .Edward { background: url(@sprite-ff4) 2385px 3268px; width: 73px; height: 100px; position: absolute; }
-.FuSoYa { background: url(@sprite-ff4) 1785px 2452px; width: 73px; height: 100px; position: absolute; }
+.FuSoYa { background: url('../assets/images/FuSoYa.png') 0px 0px; width: 103px; height: 97px; position: absolute; }
 .Golbez { background: url(@sprite-ff4) 2385px 2340px; width: 73px; height: 100px; position: absolute; }
 .Kain { background: url(@sprite-ff4) 2385px 3728px; width: 73px; height: 100px; position: absolute; }
 .PalomPorom { background: url(@sprite-ff4) 2385px 2868px; width: 120px; height: 160px; position: absolute; }
@@ -261,10 +261,56 @@ body {
 
 
 @keyframes castingFuSoYa {
-	100% { background-position-x: 1858px }
+	from { background-position-x: -720px; }
+    to { background-position-x: -926px;  }
 }
 
-.castingFuSoYa { animation: castingFuSoYa .8s steps(2) infinite; }
+.castingFuSoYa { animation: castingFuSoYa .4s steps(2) infinite }
+
+@keyframes castFuSoYa {
+	from { background-position-x: 1073px; }
+    to { background-position-x: 1073px;  }
+}
+
+.castFuSoYa { animation: castFuSoYa 2s steps(1); animation-fill-mode: forward; }
+
+@keyframes gobackFuSoYa {
+	from { background-position-x: 0px; }
+    to { background-position-x: 0px;  }
+}
+
+.gobackFuSoYa { animation: gobackFuSoYa 2s steps(1); }
+
+
+
+@keyframes deadFuSoYa {
+	from { background-position-x: 973px; }
+    to { background-position-x: 762px;  }
+}
+@keyframes deadCecil {
+	from { background-position-x: 1778px; }
+    to { background-position-x: 1633px;  }
+}
+@keyframes deadCid {
+	from { background-position-x: 1786px; }
+    to { background-position-x: 1641px;  }
+}
+@keyframes deadEdge {
+	from { background-position-x: 1634px; }
+    to { background-position-x: 1492px;  }
+}
+@keyframes deadEdward {
+    from { background-position-x: 1788px; }
+    to { background-position-x: 1645px;  }
+}
+
+
+.deadCecil { animation: deadCecil .4s steps(2); animation-fill-mode: forwards; }
+.deadCid { animation: deadCid .4s steps(2); animation-fill-mode: forwards; }
+.deadEdge { animation: deadEdge .4s steps(2); animation-fill-mode: forwards; }
+.deadEdward { animation: deadEdward .4s steps(2); animation-fill-mode: forwards; }
+.deadFuSoYa { animation: deadFuSoYa .4s steps(2); animation-fill-mode: forwards; }
+
 
 
 

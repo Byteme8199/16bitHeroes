@@ -13,6 +13,7 @@
     
 
     var anim_timer = 1;
+    var ticker
 
     $scope.paused = false;
     $scope.team = [];
@@ -42,7 +43,7 @@
 
       if(view === 'battle'){
         $scope.showBattle = true;
-        var globalTimer = $interval(tick, 30);
+        ticker = $interval(tick, 30);
         $scope.paused = false;
       } else if(view === 'select') {
         $scope.checkDisabled();
@@ -86,13 +87,13 @@
         return { "name": "Edge", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 34, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Throw", "Steal", "Ninjitsu"] }
       }
       if(name == 'Edward'){
-        return { "name": "Edward", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 31, "position": "back", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Sing", "Heal", "Hide"] }
+        return { "name": "Edward", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 31, "position": "back", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Sing", "Heal", "Hide"], "sing": [{'name': 'Sonata', 'element': 'song', 'class': 'white', 'power': -4521, 'hitrate': 120, 'runic': true, 'multiple': true, "castingTime": 5000, "animationTime": 3000 }] }
       }
       if(name == 'FuSoYa'){
-        return { "name": "FuSoYa", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 40, "position": "back", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Bless"], "magic": [{'name': 'fire', 'element': 'fire', 'class': 'black', 'power': 21, 'hitrate': 120, 'runic': true, 'multiple': true, "castingTime": 3000 }, {'name': 'fira', 'element': 'fire', 'class': 'black', 'power': 60, 'hitrate': 150, 'runic': true, 'multiple': true, "castingTime": 5000 }] }
+        return { "name": "FuSoYa", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 40, "position": "back", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Bless"], "magic": [{'name': 'fire', 'element': 'fire', 'class': 'black', 'power': 21, 'hitrate': 120, 'runic': true, 'multiple': true, "castingTime": 3000, "animationTime": 3000 }, {'name': 'fira', 'element': 'fire', 'class': 'black', 'power': 60, 'hitrate': 150, 'runic': true, 'multiple': true, "castingTime": 5000, "animationTime": 3000 }] }
       }
       if(name == 'Rosa'){
-        return { "name": "Rosa", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "back", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"], "magic": [{'name': 'cure', 'element': 'holy', 'class': 'white', 'power': -21, 'hitrate': 0, 'runic': true, 'multiple': false, "castingTime": 1000 }, {'name': 'cura', 'element': 'holy', 'class': 'white', 'power': -60, 'hitrate': 0, 'runic': true, 'multiple': false, "castingTime": 5000 }] }
+        return { "name": "Rosa", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "back", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"], "magic": [{'name': 'cure', 'element': 'holy', 'class': 'white', 'power': -21, 'hitrate': 0, 'runic': true, 'multiple': false, "castingTime": 1000, "animationTime": 3000 }, {'name': 'cura', 'element': 'holy', 'class': 'white', 'power': -60, 'hitrate': 0, 'runic': true, 'multiple': false, "castingTime": 5000, "animationTime": 3000 }] }
       }
       if(name == 'Kain'){
         return { "name": "Kain", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
@@ -356,7 +357,6 @@
     }
 
     function tick(){
-      if(!$scope.paused) {
         var enemiesDead = 0;
         var teamDead = 0;
 
@@ -364,6 +364,8 @@
           if($scope.team[c].hp > 0){
             updateInit($scope.team[c], c);
             teamDead += 1
+          } else {
+            showAnim($scope.team[c], 'dead' + $scope.team[c].name) 
           }
         }
         for (var d = 0; d < $scope.enemyForce.length; d++){
@@ -376,7 +378,8 @@
         if(teamDead === 0) {
           console.log("Game Over")
           // Drop Equipment / Gear
-          $scope.paused = true;
+          $interval.cancel(ticker);
+          $scope.clearInputs = true
         }
 
         if(enemiesDead === 0) {
@@ -384,10 +387,10 @@
           // Get Experience
           // Get Gil & Treasure
           // Get Next Match
-          $scope.paused = true;
+          $interval.cancel(ticker);
         }
 
-      }
+        
     }
 
     function pickTeamTarget(enemy, callback) {
@@ -410,9 +413,9 @@
         $scope.enemyForce[num].init += ((96 * ($scope.enemyForce[num].speed + 20)) / 16);
       } else {
         pickTeamTarget(enemy, function() {
-            $scope.currentAITarget.hp -= 40;  ///  Put the code you want to actually work here....
+            $scope.currentAITarget.hp -= 4;  ///  Put the code you want to actually work here....
             $scope.enemyForce[num].init = 0;
-            console.log(enemy.name + " " +  num + " Attacks " + $scope.currentAITarget.name + " for 40 dmg");
+            console.log(enemy.name + " " +  num + " Attacks " + $scope.currentAITarget.name + " for 4 dmg");
         })
       }
     }
@@ -456,7 +459,7 @@
           } else {
             $scope.target = $scope.backrow[num];
           }
-          console.log($scope.target)
+          //console.log($scope.target)
       }
     }
 
@@ -466,10 +469,10 @@
       $("." + $scope.currentChar.name + "_status strong").css('color', 'white');
       $scope.inputting = false;
       $scope.commands = [];
-      $scope.magicList = [];
+      $scope.subActionList = [];
       $scope.paused = false;
       $scope.target = [];
-      $scope.chosenSpell = '';
+      $scope.chosenSubAction = '';
     }
 
     function getTarget(callback) {
@@ -483,11 +486,11 @@
         }
     }
 
-    function selectMagic(callback) {
-        $scope.chosenSpell = ''
+    function selectSubAction(callback) {
+        $scope.chosenSubAction = ''
         loop();
         function loop() {
-            if ($scope.chosenSpell === '') {
+            if ($scope.chosenSubAction === '') {
               setTimeout(loop, 100);
             } else {
               callback();
@@ -514,9 +517,9 @@
       $('.pointer').css('left', -1000);
     }
 
-    $scope.selectMagic = function(spell){
-      $scope.chosenSpell = spell
-    } 
+    $scope.selectSubAction = function(action){
+      $scope.chosenSubAction = action
+    }
 
     $scope.runCommand = function(command){
 
@@ -524,8 +527,7 @@
       
       if(command === "Fight") {
         getTarget(function() {
-            addToQueue('Fight', $scope.target, 1000, $scope.currentChar, '');
-            //$scope.target.hp -= $scope.currentChar.strength;  ///  Put the code you want to actually work here....
+            addToQueue('Fight', $scope.target, 1000, $scope.currentChar, {"name": "Fight"});
             resetCommands()
         });
       }
@@ -537,14 +539,25 @@
 
       if(command == "Magic") {
 
-        $scope.magicList = $scope.currentChar.magic;
+        $scope.subActionList = $scope.currentChar.magic;
         $scope.commands = [];
 
-        selectMagic(function(){
-          //console.log($scope.chosenSpell);
+        selectSubAction(function(){
           getTarget(function() {
-            //$scope.target.hp -= $scope.chosenSpell.power;  ///  Put the code you want to actually work here....
-            addToQueue('Magic', $scope.target, $scope.chosenSpell.castingTime, $scope.currentChar, $scope.chosenSpell);
+            addToQueue('Magic', $scope.target, $scope.chosenSubAction.castingTime, $scope.currentChar, $scope.chosenSubAction);
+            resetCommands();
+          });
+        });
+      }
+
+      if(command == "Sing") {
+
+        $scope.subActionList = $scope.currentChar.sing;
+        $scope.commands = [];
+
+        selectSubAction(function(){
+          getTarget(function() {
+            addToQueue('Sing', $scope.target, $scope.chosenSubAction.castingTime, $scope.currentChar, $scope.chosenSubAction);
             resetCommands();
           });
         });
@@ -553,30 +566,45 @@
     }
 
     function addToQueue(action, target, timer, char, ability){
-      // console.log(action);
-      // console.log(target);
-      // console.log(timer);
-      // console.log(char);
-      // console.log(ability);
+
+      console.log(char.name + " prepares " + ability.name + " against " + target.name)
       /// Add Timer, and then Add Action Results
+      showAnim(char, 'casting' + char.name)   // Chanting Spell / Getting Ready to do an Action
+
       setTimeout(doAction, timer);
 
       function doAction(){
-        if(action === 'Fight'){
-          // Actual formula should go here
-          target.hp -= char.strength; 
-          shownAction('Fight');
-        }
-        if(action === 'Magic'){
-          setTimeout(function(){
-            showAnim(char, 'casting' + char.name)
-          }, timer);
-          target.hp -= ability.power;
+
+        if(char.hp > 0){
+          console.log(char.name + " casts " + ability.name + " against " + target.name)
+
           shownAction(ability.name);
+          
+
+          if(action === 'Fight'){
+            // Actual formula should go here
+            target.hp -= char.strength;
+          }
+
+          if(action === 'Magic'){
+            showAnim(char, 'cast' + char.name)  //  Casting Spell // Initiating Action Animations
+            target.hp -= ability.power;
+            setTimeout(function(){
+              showAnim(char, 'goback' + char.name)
+            }, ability.animationTime)
+          }
+
+          if(action === 'Sing'){
+            target.hp -= ability.power;
+          }
+          if(target.hp < 0 ){
+            showAnim(target, 'deathBlow')
+          }
+
+          
         }
-        if(target.hp < 0 ){
-          showAnim(target, 'deathBlow')
-        }
+
+        
       }
 
       function shownAction(name){
@@ -599,7 +627,9 @@
       } else {
         targetID = "#" + target.name;
       }
-      console.log(targetID);
+      $(targetID).removeClass();
+      $(targetID).addClass('character');
+      $(targetID).addClass(target.name);
       $(targetID).addClass(anim);
     }
 
