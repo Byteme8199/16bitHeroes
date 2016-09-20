@@ -50,18 +50,156 @@
           <img class="status_portrait" ng-class="char.position" ng-click="changePosition(char)" ng-src="assets/images/{{ char.name}}_small.png">
           <strong>{{ char.name }}</strong> 
           <div class="stat"><span>LV</span> {{ char.level }}</div>
-          <div class="stat"><span>HP</span> {{ char.hp }} / {{ char.hptotal }}</div>
-          <div class="stat"><span>MP</span> {{ char.hp }} / {{ char.mptotal }}</div>
+          <div class="stat"><span>HP</span> {{ char.hp }} / {{ char.hp_total }}</div>
+          <div class="stat"><span>MP</span> {{ char.mp }} / {{ char.mp_total }}</div>
           <div class="clear"></div>
         </div>
       </div>
     </div>
 
-    <div id="optionsHolder">
-      <div ng-click="switchViews('battle')" ng-show="goodColumns">Next</div>
+    <div class="optionsHolder">
+      <div ng-click="switchViews('battle')" ng-show="goodColumns">Fight</div>
+      <div ng-click="switchViews('store')" ng-show="goodColumns">Store</div>
+      <div ng-click="switchViews('equip')" ng-show="goodColumns">Equip</div>
     </div>
 
   </div>
+
+
+
+
+<div id="EquipScreen" ng-show="showEquip">
+
+    <div id="storeHolder" >
+      <div class="itemBlock itemBlockHead">
+          <span>Name</span> <small>(owned)</small> 
+          <span ng-if="equipmentType > ''"><small><i ng-class="equipmentType" class="equipIcon"></i>: {{ equipmentType }}s</small></span>  
+          <div class="pull-right"><i class="gil equipIcon"></i> Buy </div>
+      </div>
+      <div ng-repeat="item in equipmentList track by $index | filter: equipmentType" ng-mouseover="setItem(item)">
+        <div class="itemBlock onHover" ng-click="purchaseEquipment(item)" ng-disabled="gil >= item.cost">
+          <span ng-class="item.type" class="equipIcon"></span>
+          <span>{{ item.name }}</span> 
+          <small>({{ owned(item) }})</small>
+          <div class="pull-right">{{ item.cost }}</div>
+          <div class="clear"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="optionsHolder">
+      <div ng-click="switchViews('party')" ng-show="goodColumns">Back</div>
+      <div ng-click="switchViews('store')" ng-show="goodColumns">Store</div>
+    </div>
+
+    <div class="optionsHolder">
+      <div class="filterHolder">
+        <div>Filter By:</div>
+        <div ng-repeat="itemType in equipmentTypes" ng-click="setEquipmentType(itemType)"><i ng-class="itemType" class="equipIcon hoverSelect"></i></div>
+        <div ng-click="setEquipmentType('')"><i class="equipIcon hoverSelect fa fa-close"></i></div>
+      </div>
+    </div>
+
+    <div class="optionsHolder" style="height: 210px;">
+      <div><i ng-class="selectedItem.type" class="equipIcon"></i> <italic>{{ selectedItem.name }}</italic></div>
+      <div ng-show="selectedItem.power">Power: <span>{{ selectedItem.power }}</span></div>
+      <div ng-show="selectedItem.power">Hit Rate: <span>{{ selectedItem.hit_rate }}</span></div>
+      <div ng-show="selectedItem.defense">Defense: <span>{{ selectedItem.defense }}</span></div>
+      <div ng-show="selectedItem.defense">M. Def.: <span>{{ selectedItem.magic_defense }}</span></div>
+      <div ng-show="selectedItem.defense">Evasion: <span>{{ selectedItem.evasion }}</span></div>
+      <div ng-show="selectedItem.defense">M. Ev: <span>{{ selectedItem.magic_evasion }}</span></div>
+      <div class="desc">{{ selectedItem.desc }}</div>
+    </div>
+
+    <div id="storeHolder" style="height: 280px; width:953px; overflow: initial">
+      <div ng-repeat="char in team" style="float:left; margin:15px 25px">
+        <div class="statusBlock" ng-show="filterFn(char, selectedItem)">
+          <img class="status_portrait" ng-click="selectCharacterToEquip(char)" ng-src="assets/images/{{ char.name}}_small.png" style="margin-bottom: 10px">
+          <div class="comparison" ng-show="selectedItem.power"><span>Power: </span> <span class="pull-right" ng-bind-html="getTotalComparison(char, 'power', selectedItem)"></span></div>
+          <div class="comparison" ng-show="selectedItem.power"><span>Hit Rate: </span>  <span class="pull-right" ng-bind-html="getTotalComparison(char, 'hit_rate', selectedItem)"></span></div>
+          <div class="comparison" ng-show="selectedItem.defense"><span>Defense:  </span>  <span class="pull-right" ng-bind-html="getTotalComparison(char, 'defense', selectedItem)"></span></div>
+          <div class="comparison" ng-show="selectedItem.defense"><span>M. Def.: </span>  <span class="pull-right" ng-bind-html="getTotalComparison(char, 'magic_defense', selectedItem)"></span></div>
+          <div class="comparison" ng-show="selectedItem.defense"><span>Evasion:  </span>  <span class="pull-right" ng-bind-html="getTotalComparison(char, 'evasion', selectedItem)"></span></div>
+          <div class="comparison" ng-show="selectedItem.defense"><span>M. Ev.: </span>  <span class="pull-right" ng-bind-html="getTotalComparison(char, 'magic_evasion', selectedItem)"></span></div>
+        </div>
+      </div>
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+<div id="StoreScreen" ng-show="showStore">
+
+    <div id="storeHolder" >
+      <div class="itemBlock itemBlockHead">
+          <span>Name</span> <small>(owned)</small> 
+          <span ng-if="equipmentType > ''"><small><i ng-class="equipmentType" class="equipIcon"></i>: {{ equipmentType }}s</small></span>  
+          <div class="pull-right"><i class="gil equipIcon"></i> Buy </div>
+      </div>
+      <div ng-repeat="item in equipment | filter: { type : equipmentType}" ng-mouseover="setItem(item)">
+        <div class="itemBlock onHover" ng-click="purchaseEquipment(item)" ng-disabled="gil >= item.cost">
+          <span ng-class="item.type" class="equipIcon"></span>
+          <span>{{ item.name }}</span> 
+          <small>({{ owned(item) }})</small>
+          <div class="pull-right">{{ item.cost }}</div>
+          <div class="clear"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="optionsHolder">
+      <div ng-click="switchViews('party')" ng-show="goodColumns">Back</div>
+      <div ng-click="switchViews('equip')" ng-show="goodColumns">Equip</div>
+    </div>
+
+    <div class="optionsHolder">
+      <div class="filterHolder">
+        <div>Filter By:</div>
+        <div ng-repeat="itemType in equipmentTypes" ng-click="setEquipmentType(itemType)"><i ng-class="itemType" class="equipIcon hoverSelect"></i></div>
+        <div ng-click="setEquipmentType('')"><i class="equipIcon hoverSelect fa fa-close"></i></div>
+      </div>
+    </div>
+
+    <div class="optionsHolder" style="height: 210px;">
+      <div><i ng-class="selectedItem.type" class="equipIcon"></i> <italic>{{ selectedItem.name }}</italic></div>
+      <div ng-show="selectedItem.power">Power: <span>{{ selectedItem.power }}</span></div>
+      <div ng-show="selectedItem.power">Hit Rate: <span>{{ selectedItem.hit_rate }}</span></div>
+      <div ng-show="selectedItem.defense">Defense: <span>{{ selectedItem.defense }}</span></div>
+      <div ng-show="selectedItem.defense">M. Def.: <span>{{ selectedItem.magic_defense }}</span></div>
+      <div ng-show="selectedItem.defense">Evasion: <span>{{ selectedItem.evasion }}</span></div>
+      <div ng-show="selectedItem.defense">M. Ev: <span>{{ selectedItem.magic_evasion }}</span></div>
+      <div class="desc">{{ selectedItem.desc }}</div>
+    </div>
+
+    <div class="optionsHolder">
+      <div><i class="gil equipIcon"></i> {{ gil }}</div>
+    </div>
+
+    <div class="clear"></div>
+
+    <div id="storeHolder" style="height: 280px; width:953px; overflow: initial">
+      <div ng-repeat="char in team" style="float:left; margin:15px 25px">
+        <div class="statusBlock" ng-show="filterFn(char, selectedItem)">
+          <img class="status_portrait" ng-src="assets/images/{{ char.name}}_small.png" style="margin-bottom: 10px">
+          <div class="comparison" ng-show="selectedItem.power"><span>Power: </span> <span class="pull-right" ng-bind-html="getTotalComparison(char, 'power', selectedItem)"></span></div>
+          <div class="comparison" ng-show="selectedItem.power"><span>Hit Rate: </span>  <span class="pull-right" ng-bind-html="getTotalComparison(char, 'hit_rate', selectedItem)"></span></div>
+          <div class="comparison" ng-show="selectedItem.defense"><span>Defense:  </span>  <span class="pull-right" ng-bind-html="getTotalComparison(char, 'defense', selectedItem)"></span></div>
+          <div class="comparison" ng-show="selectedItem.defense"><span>M. Def.: </span>  <span class="pull-right" ng-bind-html="getTotalComparison(char, 'magic_defense', selectedItem)"></span></div>
+          <div class="comparison" ng-show="selectedItem.defense"><span>Evasion:  </span>  <span class="pull-right" ng-bind-html="getTotalComparison(char, 'evasion', selectedItem)"></span></div>
+          <div class="comparison" ng-show="selectedItem.defense"><span>M. Ev.: </span>  <span class="pull-right" ng-bind-html="getTotalComparison(char, 'magic_evasion', selectedItem)"></span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
 
 
 
@@ -113,13 +251,21 @@
             <div class="command" ng-click="runCommand(command)">{{command}}</div>
           </div>
           <div ng-repeat="action in subActionList">
-            <div class="command" ng-click="selectSubAction(action)"><i class="fa fa-circle" style="color: {{action.class}}"></i> {{action.name}}</div>
+            <div class="command" ng-click="selectSubAction(action)" ng-mouseover="currentSpell = action.cost"><i class="fa fa-circle" style="color: {{action.class}}"></i> {{action.name}}</div>
+          </div>
+          <div>
+              <span>{{ currentChar.mp }} / {{ currentChar.mp_total}}</span>
+              <span>MP: {{ currentSpell }}</span>
           </div>
         </div>
       </div>
 
       <div id="gui" class="right">
-        <div ng-repeat="char in team" class="status {{ char.name }}_status"><strong>{{ char.name }}</strong> <div class="init"></div> <span>{{ char.hp }} / {{ char.hptotal}}</span></div>
+        <div ng-repeat="char in team" class="status {{ char.name }}_status">
+            <strong>{{ char.name }}</strong> 
+            <div class="init"></div> 
+            <span>{{ char.hp }} / {{ char.hp_total}}</span>
+        </div>
       </div>
     </div>
 

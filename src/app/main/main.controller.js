@@ -9,9 +9,6 @@
   function MainController($timeout, toastr, $scope, $interval) {
     var vm = this;
 
-    //var magusReady = $interval(magusAnim, 1000);
-    
-
     var anim_timer = 1;
     var ticker
 
@@ -22,8 +19,14 @@
     $scope.showBattle = false;
     $scope.showSelect = false;
     $scope.showParty = false;
+    $scope.showStore = false;
+    $scope.showEquip = false;
 
-    $scope.unlocked = ["Cecil", "Rosa", "Rydia", "Kain", "Tellah", "Yang", "PalomPorom", "Golbez", "FuSoYa", "Edge", "Cid", "Edward", "Terra", "Locke", "Edgar", "Setzer", "Mog", "Banon", "Celes", "Cyan", "Gau", "GoGo", "Kefka", "Leo", "Relm", "Sabin", "Shadow", "Strago", "Umaro", "Crono", "Frog", "Lucca", "Ryu", "Nina", "Bow", "Randi"]
+    $scope.uniqueID = 0;
+
+    $scope.gil = 1000;
+
+    $scope.unlocked = ["Cecil", "Rosa", "Rydia", "Kain", "Tellah", "Yang", "PalomPorom", "Golbez", "FuSoYa", "Edge", "Cid", "Edward", "Terra", "Locke", "Edgar", "Setzer", "Mog", "Banon", "Celes", "Cyan", "Gau", "GoGo", "Kefka", "Leo", "Relm", "Sabin", "Shadow", "Strago", "Umaro", "Crono", "Frog", "Lucca", "Robo", "Ayla", "Magus", "Marle", "Ryu", "Nina", "Bow", "Randi"]
     //$scope.unlocked = ["Cecil", "Rosa", "Rydia", "Terra", "Locke", "Edgar", "Crono", "Frog", "Lucca", "Ryu", "Nina", "Bow", "Randi"]
     
     $scope.roster = []
@@ -40,6 +43,11 @@
       $scope.showBattle = false;
       $scope.showSelect = false;
       $scope.showParty = false;
+      $scope.showStore = false;
+      $scope.showEquip = false;
+
+      $scope.selectedItem = "";
+      $scope.equipmentType = "";
 
       if(view === 'battle'){
         $scope.showBattle = true;
@@ -50,188 +58,626 @@
         $scope.showSelect = true;
       } else if(view === 'party') {
         $scope.showParty = true;
+      } else if(view === 'store') {
+        $scope.showStore = true;
+      } else if(view === 'equip') {
+        $scope.showEquip = true;
       }
     }
 
     $scope.enemyForce = []
 
     $scope.returnEnemy = function(name, x, y, num){
-      if(name == 'Goblin') {
-        return { "num": num, "name": "Goblin", "init": 0, "speed": 40, "level": 3, "pixelheight": 0, "hp": 6, "hptotal": 6, "strength": 19, "exp": 28, "gil": 5, "spacingx": x, "spacingy": y, "image": "assets/images/ff6enemies2.png", "offsetx": 1402, "offsety": 435, "width": 117, "height": 130, "zoom": 0 }
-      }
-      if(name == 'Slut') {
-        return { "num": num, "name": "Slut", "init": 0, "speed": 36, "level": 3, "pixelheight": 0, "hp": 23, "hptotal": 23, "strength": 19, "exp": 28, "gil": 5, "spacingx": x, "spacingy": y, "image": "assets/images/ff6enemies2.png", "offsetx": 722, "offsety": 1691, "width": 206, "height": 220, "zoom": 0 }
+      if(name == 'Guard') {
+        return { "num": num, "name": "Guard", "init": 0, "level": 5, "pixelheight": 0, "hp": 40, "hptotal": 40, "stats": {"speed": 30, "magic": 6, "attack": 16, "defense": 100, "evasion": 0, "magic_defense": 140, "magic_evasion": 0, "hit_rate": 100}, "exp": 48, "gil": 48, "spacingx": x, "spacingy": y, "image": "assets/images/ff6enemies.png", "offsetx": 0, "offsety": 0, "width": 150, "height": 207, "zoom": 0 }
       }
     }
 
 
     // enemy Group 1?
-    $scope.enemyForce.push($scope.returnEnemy("Slut", 25, 250, 1));
-    $scope.enemyForce.push($scope.returnEnemy("Goblin", 240, 270, 2));
-    $scope.enemyForce.push($scope.returnEnemy("Goblin", 240, 400, 3));
+    $scope.enemyForce.push($scope.returnEnemy("Guard", 10, 180, 1));
+    $scope.enemyForce.push($scope.returnEnemy("Guard", 10, 350, 2));
+    $scope.enemyForce.push($scope.returnEnemy("Guard", 210, 270, 3));
 
     //console.log($scope.enemyForce);
 
+    $scope.getEquipment = function(name){
+      var thisItem = [];
+      angular.forEach($scope.equipment, function(item) {
+        if(item.id === name){
+          thisItem = item;
+        }
+      });
+      return thisItem
+    }
+
+    $scope.selectedItem = "";
+
+    $scope.setItem = function(item){
+      $scope.selectedItem = item;
+    }
+
+    $scope.getTotal = function(char, ability){
+      if(ability === 'power'){
+        return ($scope.getEquipment(char.equipment.left).power || 0) + ($scope.getEquipment(char.equipment.right).power || 0) + ($scope.getEquipment(char.equipment.helm).power || 0) + ($scope.getEquipment(char.equipment.armor).power || 0) + ($scope.getEquipment(char.equipment.relic).power || 0)
+      } else if(ability === 'hit_rate'){
+        return ($scope.getEquipment(char.equipment.left).hit_rate || 0) + ($scope.getEquipment(char.equipment.right).hit_rate || 0) + ($scope.getEquipment(char.equipment.helm).hit_rate || 0) + ($scope.getEquipment(char.equipment.armor).hit_rate || 0) + ($scope.getEquipment(char.equipment.relic).hit_rate || 0)
+      } else if(ability === 'defense'){
+        return ($scope.getEquipment(char.equipment.left).defense || 0) + ($scope.getEquipment(char.equipment.right).defense || 0) + ($scope.getEquipment(char.equipment.helm).defense || 0) + ($scope.getEquipment(char.equipment.armor).defense || 0) + ($scope.getEquipment(char.equipment.relic).defense || 0)
+      } else if(ability === 'evasion'){
+        return ($scope.getEquipment(char.equipment.left).evasion || 0) + ($scope.getEquipment(char.equipment.right).evasion || 0) + ($scope.getEquipment(char.equipment.helm).evasion || 0) + ($scope.getEquipment(char.equipment.armor).evasion || 0) + ($scope.getEquipment(char.equipment.relic).evasion || 0)
+      } else if(ability === 'magic_defense'){
+        return ($scope.getEquipment(char.equipment.left).magic_defense || 0) + ($scope.getEquipment(char.equipment.right).magic_defense || 0) + ($scope.getEquipment(char.equipment.helm).magic_defense || 0) + ($scope.getEquipment(char.equipment.armor).magic_defense || 0) + ($scope.getEquipment(char.equipment.relic).magic_defense || 0)
+      } else if(ability === 'magic_evasion'){
+        return ($scope.getEquipment(char.equipment.left).magic_evasion || 0) + ($scope.getEquipment(char.equipment.right).magic_evasion || 0) + ($scope.getEquipment(char.equipment.helm).magic_evasion || 0) + ($scope.getEquipment(char.equipment.armor).magic_evasion || 0) + ($scope.getEquipment(char.equipment.relic).magic_evasion || 0)
+      } 
+    }
+
+    $scope.getTotalComparison = function(char, ability, newItem){
+
+      var oldItem = ""
+
+      if(newItem.slot === 'left'){
+        oldItem = $scope.getEquipment(char.equipment.left)
+      } else if(newItem.slot === 'right'){
+        oldItem = $scope.getEquipment(char.equipment.right)
+      } else if(newItem.slot === 'helm'){
+        oldItem = $scope.getEquipment(char.equipment.helm)
+      } else if(newItem.slot === 'armor'){
+        oldItem = $scope.getEquipment(char.equipment.armor)
+      } else if(newItem.slot === 'relic'){
+        oldItem = $scope.getEquipment(char.equipment.relic)
+      }
+
+      var oldItemStat
+      var newItemStat
+
+      if(ability === 'power'){
+        oldItemStat = oldItem.power || 0;
+        newItemStat = newItem.power || 0;
+      } else if(ability === 'hit_rate'){
+        oldItemStat = oldItem.hit_rate || 0;
+        newItemStat = newItem.hit_rate || 0;
+      } else if(ability === 'defense'){
+        oldItemStat = oldItem.defense || 0;
+        newItemStat = newItem.defense || 0;
+      } else if(ability === 'evasion'){
+        oldItemStat = oldItem.evasion || 0;
+        newItemStat = newItem.evasion || 0;
+      } else if(ability === 'magic_defense'){
+        oldItemStat = oldItem.magic_defense || 0;
+        newItemStat = newItem.magic_defense || 0;
+      } else if(ability === 'magic_evasion'){
+        oldItemStat = oldItem.magic_evasion || 0;
+        newItemStat = newItem.magic_evasion || 0;
+      } 
+
+      var oldTotal = $scope.getTotal(char, ability)
+      var newTotal = oldTotal - oldItemStat + newItemStat
+      var diff = newTotal - oldTotal
+      var diffdiv = ""
+
+      if(diff === 0){
+        diffdiv = "E"
+      } else if (diff < 0){
+        diffdiv = "<i class='fa fa-caret-down red' aria-hidden='true'></i> " + diff
+      } else if (diff > 0){
+        diffdiv = "<i class='fa fa-caret-up green' aria-hidden='true'></i> " + diff
+      }
+
+      //console.log(oldTotal, newTotal, diff, oldItem, newItem.slot)
+
+      return diffdiv
+    }
+
+    $scope.filterFn = function(char, item) {
+      var isProficient = false;
+
+      angular.forEach(char.proficiencies, function(prof) {
+        if(prof === item.type){
+          isProficient += true
+        }
+      });
+
+      return isProficient
+    };
+
+    $scope.setEquipmentType = function(itemType){
+      $scope.equipmentType = itemType;
+    }
+
+    $scope.purchaseEquipment = function(item){
+      $scope.uniqueID += 1;
+      if(($scope.gil - item.cost) >= 0){
+        item.uniqueID = $scope.uniqueID;
+        $scope.equipmentList.push(item)
+        $scope.gil -= item.cost;
+      }
+      console.log($scope.equipmentList)
+    }
+
+    $scope.owned = function(item) {
+      var num = 0
+      angular.forEach($scope.equipmentList, function(list) {
+        if(item.name === list.name){
+          num++;
+        }
+      });
+      return num;
+    }
+
+    $scope.equipCharacter = function(item, itemIndex, char){
+      console.log($scope.equipmentList)
+      $scope.equipmentList.splice(itemIndex, 1);
+      char.equipment[item.slot].push(item.id)
+      console.log($scope.equipmentList);
+      console.log(char);
+    }
+
+    $scope.selectCharacterToEquip = function(char){
+      $scope.selectedCharacterToEquip = char
+    }
+
+    $scope.equipmentList = [];
+
+    $scope.equipmentTypes = [ 'Claw', 'Glove', 'Dirk', 'Dagger', 'Sword', 'Katana', 'Mace', 'Hammer', 'Axe', 'Spear', 'Javelin', 'Scythe', 'Staff', 'Rod', 'Harp', 'Whip', 'Gun', 'Bow', 'Boomerang', 'Ninja', 'Shield', 'HeavyShield', 'Robe', 'LightArmor', 'HeavyArmor', 'Hat', 'HeavyHelm', 'Relic' ]
+    $scope.equipment = [
+
+      ///// WEAPONS ///////////
+
+        ///// CLAWS ///////////
+        ///// GLOVES ////////
+
+        ///// DIRKS ///////////        
+        
+        ///// DAGGGER ///////////
+        {'id': 'Dagger-1', 'uniqueID': 0, 'name': 'Dagger', 'hit_rate': 180, 'power': 26, 'type': 'Dagger', 'slot': 'right', 'cost': 150, 'desc': 'Light and well-balanced dagger.'},
+        {'id': 'Dagger-2', 'uniqueID': 0, 'name': 'Mithril Knife', 'hit_rate': 180, 'power': 30, 'type': 'Dagger', 'slot': 'right', 'cost': 300, 'desc': 'Sturdy adventurer\'s knife forged from pure mythril.'},
+        
+        ///// SWORD ///////////
+        {'id': 'Sword-1', 'uniqueID': 0, 'name': 'Mythril Sword', 'hit_rate': 150, 'power': 38, 'type': 'Sword', 'slot': 'right', 'cost': 450, 'desc': 'Simple sword forged from mythril.'},
+        
+        ///// KATANAS ///////////
+
+        ///// MACES ///////////
+        ///// HAMMERS /////////
+        ///// AXES /////////
+
+        ///// SPEARS ///////////
+        ///// JAVELINS ////////
+        ///// SCYTHES ///////
+
+        ///// STAVES /////////
+        ///// RODS ///////////
+        ///// HARPS /////////  
+        ///// WHIPS /////////
+        
+        ///// GUNS /////////
+        ///// BOWS ///////////
+        ////  BOOMERANGS ////////
+        ///// THROWN ///////////
+
+
+      ///// SHIELDS ////////////
+
+        ///// SHIELDS ///////
+        {'id': 'Shield-1', 'uniqueID': 0, 'name': 'Buckler', 'defense': 16, 'magic_defense': 10, 'evasion': 10, 'magic_evasion': 0, 'type': 'Shield', 'slot': 'left', 'cost': 200, 'desc': 'Light and simple shield.'},
+
+        ///// HEAVY SHIELDS ///////
+        {'id': 'HeavyShield-1', 'uniqueID': 0, 'name': 'Heavy Shield', 'defense': 22, 'magic_defense': 14, 'evasion': 10, 'magic_evasion': 0, 'type': 'HeavyShield', 'slot': 'left', 'cost': 400, 'desc': 'Large, sturdy shield made of steel.'},
+
+
+      /////  ARMORS ///////////
+
+        ///// HEAVY ARMOR ///////
+        {'id': 'HeavyArmor-1', 'uniqueID': 0, 'name': 'Iron Armor', 'defense': 40, 'magic_defense': 27, 'evasion': 0, 'magic_evasion': 0, 'type': 'HeavyArmor', 'slot': 'armor', 'cost': 700, 'desc': 'Suit of heavy iron armor'},
+
+        ///// LIGHT ARMOR ///////
+        {'id': 'LightArmor-1', 'uniqueID': 0, 'name': 'Leather Armor', 'defense': 28, 'magic_defense': 19, 'evasion': 0, 'magic_evasion': 0, 'type': 'LightArmor', 'slot': 'armor', 'cost': 10, 'desc': 'Armor made of hardened leather.'},
+
+        ///// ROBES ///////
+        {'id': 'Robe-1', 'uniqueID': 0, 'name': 'Cotton Robe', 'defense': 32, 'magic_defense': 21, 'evasion': 0, 'magic_evasion': 0, 'type': 'Robe', 'slot': 'armor', 'cost': 200, 'desc': 'Mutilayered cotton robe.'},
+
+
+      ///// HELMS /////////
+
+        ////// HATS /////
+        {'id': 'Hat-1', 'uniqueID': 0, 'name': 'Leather Cap', 'defense': 11, 'magic_defense': 7, 'evasion': 0, 'magic_evasion': 0, 'type': 'Hat', 'slot': 'helm', 'cost': 10, 'desc': 'Lightweight, stitched leather cap.'},
+
+        ////// HEAVY HELMETS /////
+        {'id': 'HeavyHelm-1', 'uniqueID': 0, 'name': 'Iron Helm', 'defense': 18, 'magic_defense': 12, 'evasion': 0, 'magic_evasion': 0, 'type': 'HeavyHelm', 'slot': 'helm', 'cost': 1000, 'desc': 'Heavy iron helm.'},
+
+
+      ///// RELICS ////////////
+        
+        ///// STATUS EFFECTS ////
+        {'id': 'StatusEffect-1', 'uniqueID': 0, 'name': 'Guard Ring', 'type': 'Relic', 'slot': 'relic', 'cost': 5000, 'desc': 'Ring enchanted with Protect. Casts Protect on the wearer.'}
+
+    ]
+
+    $scope.calcHP = function(lvl, stamina){
+      var hp = stamina * lvl * (Math.sqrt(lvl) / 3) + stamina
+      if (hp > 9999) {
+        hp = 9999
+      }
+      return Math.ceil(hp)
+    }
+
+    $scope.calcMP = function(lvl, magic){
+      var mp = magic * lvl * (Math.sqrt(lvl) / 30) + (magic / 2)
+      if (mp > 999) {
+        mp = 999
+      }
+      return Math.ceil(mp)
+    }
 
     $scope.returnCharacter = function(name){
 
       ///////// FF4 /////////
 
       if(name == 'Cecil'){
-        return { "name": "Cecil", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 28, "position": "front", "hp": 100, "hptotal": 1000, "defending": false, "commands": ["Fight", "Defend", "Cover", "Magic"] }
+        return { "name": "Cecil", "game": "Final Fantasy 4", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": $scope.calcHP(1, 36), "mp_total": $scope.calcMP(1, 30), "hp_total": $scope.calcHP(1, 36),
+            "stats": {"strength": 40, "speed": 29, "stamina": 36, "magic": 30, "attack": 25, "defense": 51, "evasion": 7, "magic_defense": 27, "magic_evasion": 5},
+            "status": {"defending": false}, "commands": ["Fight", "Defend", "Cover", "Magic"], 
+            "equipment": {"left": "HeavyShield-1", "right": "Sword-1", "helm": "HeavyHelm-1", "armor": "HeavyArmor-1", "relic": "StatusEffect-1"},
+            //"equipment": {"left": "", "right": "", "helm": "", "armor": "", "relic": ""},
+            "proficiencies": ["Dagger","Sword","Shield","HeavyShield","HeavyArmor", "LightArmor","Robe","Hat","HeavyHelm","Relic"]
+
+        }
       }
+
       if(name == 'Cid'){
-        return { "name": "Cid", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 26, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Analyze", "Airship"] }
+        return { "name": "Cid", "game": "Final Fantasy 4", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 28), "hp": $scope.calcHP(1, 38), "mp_total": $scope.calcMP(1, 28), "hp_total": $scope.calcHP(1, 38),
+            "stats": {"strength": 44, "speed": 25, "stamina": 38, "magic": 28, "attack": 27, "defense": 50, "evasion": 6, "magic_defense": 30, "magic_evasion": 6},
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Analyze", "Airship"],
+            "equipment": {"left": "", "right": "", "helm": "", "armor": "", "relic": ""},
+            "proficiencies": ["Dagger","Sword","Shield","HeavyShield","HeavyArmor", "LightArmor","Robe","Hat","HeavyHelm","Relic"]
+        }
       }
+
       if(name == 'Edge'){
-        return { "name": "Edge", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 34, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Throw", "Steal", "Ninjitsu"] }
+        return { "name": "Edge", "game": "Final Fantasy 4", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 32), "hp": $scope.calcHP(1, 30), "mp_total": $scope.calcMP(1, 32), "hp_total": $scope.calcHP(1, 30),
+            "stats": {"strength": 35, "speed": 36, "stamina": 30, "magic": 32, "attack": 25, "defense": 46, "evasion": 15, "magic_defense": 25, "magic_evasion": 15},
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Throw", "Steal", "Ninjitsu"],
+            "equipment": {"left": "", "right": "", "helm": "", "armor": "", "relic": ""},
+            "proficiencies": ["Dagger","Sword","Shield","LightArmor","Robe","Hat","Relic"]
+        }
       }
+
       if(name == 'Edward'){
-        return { "name": "Edward", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 31, "position": "back", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Sing", "Heal", "Hide"], "sing": [{'name': 'Sonata', 'element': 'song', 'class': 'white', 'power': -4521, 'hitrate': 120, 'runic': true, 'multiple': true, "castingTime": 5000, "animationTime": 3000 }] }
+        return { "name": "Edward", "game": "Final Fantasy 4", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 35), "hp": $scope.calcHP(1, 28), "mp_total": $scope.calcMP(1, 35), "hp_total": $scope.calcHP(1, 28), 
+            "stats": {"strength": 30, "speed": 32, "stamina": 28, "magic": 35, "attack": 20, "defense": 42, "evasion": 10, "magic_defense": 25, "magic_evasion": 10},
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Sing", "Heal", "Hide"],
+            "equipment": {"left": "", "right": "", "helm": "", "armor": "", "relic": ""},
+            "proficiencies": ["Dagger","Sword","Shield","LightArmor","Robe","Hat","Relic"],
+            "sing": [
+              {'name': 'Sonata', 'element': 'song', 'class': 'white', 'power': -4521, 'hitrate': 120, 'runic': true, 'multiple': true, "castingTime": 5000, "animationTime": 3000, "cost": 1 }
+            ]
+        }
       }
+
       if(name == 'FuSoYa'){
-        return { "name": "FuSoYa", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 40, "position": "back", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Bless"], "magic": [{'name': 'fire', 'element': 'fire', 'class': 'black', 'power': 21, 'hitrate': 120, 'runic': true, 'multiple': true, "castingTime": 3000, "animationTime": 3000 }, {'name': 'fira', 'element': 'fire', 'class': 'black', 'power': 60, 'hitrate': 150, 'runic': true, 'multiple': true, "castingTime": 5000, "animationTime": 3000 }] }
+        return { "name": "FuSoYa", "game": "Final Fantasy 4", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 39), "hp": $scope.calcHP(1, 22), "mp_total": $scope.calcMP(1, 39), "hp_total": $scope.calcHP(1, 22),
+            "stats": {"strength": 28, "speed": 25, "stamina": 22, "magic": 39, "attack": 20, "defense": 40, "evasion": 5, "magic_defense": 33, "magic_evasion": 10},
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Bless"],
+            "equipment": {"left": "", "right": "", "helm": "", "armor": "", "relic": ""},
+            "proficiencies": ["Dagger","Shield","Robe","Hat","Relic"],
+            "magic": [
+                {'name': 'Fire', 'element': 'Fire', 'class': 'black', 'power': 40, 'hitrate': 120, 'runic': true, 'multiple': true, "castingTime": 3000, "animationTime": 1000, "cost": 1 }, 
+                {'name': 'Fira', 'element': 'Fire', 'class': 'black', 'power': 60, 'hitrate': 150, 'runic': true, 'multiple': true, "castingTime": 5000, "animationTime": 3000, "cost": 2 }
+            ]
+        }
       }
+
       if(name == 'Rosa'){
-        return { "name": "Rosa", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "back", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"], "magic": [{'name': 'cure', 'element': 'holy', 'class': 'white', 'power': -21, 'hitrate': 0, 'runic': true, 'multiple': false, "castingTime": 1000, "animationTime": 3000 }, {'name': 'cura', 'element': 'holy', 'class': 'white', 'power': -60, 'hitrate': 0, 'runic': true, 'multiple': false, "castingTime": 5000, "animationTime": 3000 }] }
+        return { "name": "Rosa", "game": "Final Fantasy 4", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": {"left": "Dagger-1", "right": "", "helm": "", "armor": "HeavyArmor-1", "relic": "StatusEffect-1"},
+            "magic": [
+                {'name': 'Cure', 'element': 'holy', 'class': 'white', 'power': -21, 'hitrate': 255, 'runic': true, 'multiple': false, "castingTime": 1000, "animationTime": 3000, "cost": 1 }, 
+                {'name': 'Cura', 'element': 'holy', 'class': 'white', 'power': -60, 'hitrate': 0, 'runic': true, 'multiple': false, "castingTime": 5000, "animationTime": 3000, "cost": 2 }
+            ]
+        }
       }
+
       if(name == 'Kain'){
-        return { "name": "Kain", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Kain", "game": "Final Fantasy 4", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] }
       }
+
       if(name == 'Rydia'){
-        return { "name": "Rydia", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "back", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Rydia", "game": "Final Fantasy 4", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Golbez'){
-        return { "name": "Golbez", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Golbez", "game": "Final Fantasy 4", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'PalomPorom'){
-        return { "name": "PalomPorom", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 60, "mp": 10, "mptotal": 100, "speed": 30, "position": "back", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "PalomPorom", "game": "Final Fantasy 4", "init": 0, "level": 1, "pixelheight": 60, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Tellah'){
-        return { "name": "Tellah", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "back", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Tellah", "game": "Final Fantasy 4", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Yang'){
-        return { "name": "Yang", "game": "Final Fantasy 4", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Yang", "game": "Final Fantasy 4", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
 
       ///////// FF6 /////////
 
       if(name == 'Banon'){
-        return { "name": "Banon", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 27, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Pray"] }
+        return { "name": "Banon", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Pray"],
+            "equipment": ["", "", "", "", ""] }
       }
+
       if(name == 'Celes'){
-        return { "name": "Celes", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Celes", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Cyan'){
-        return { "name": "Cyan", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Cyan", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Edgar'){
-        return { "name": "Edgar", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Edgar", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Gau'){
-        return { "name": "Gau", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Gau", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'GoGo'){
-        return { "name": "GoGo", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "GoGo", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Kefka'){
-        return { "name": "Kefka", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Kefka", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Leo'){
-        return { "name": "Leo", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Leo", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Locke'){
-        return { "name": "Locke", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Locke", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Mog'){
-        return { "name": "Mog", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Mog", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Relm'){
-        return { "name": "Relm", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Relm", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Sabin'){
-        return { "name": "Sabin", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Sabin", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Setzer'){
-        return { "name": "Setzer", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Setzer", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Shadow'){
-        return { "name": "Shadow", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Shadow", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Strago'){
-        return { "name": "Strago", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Strago", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Terra'){
-        return { "name": "Terra", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Terra", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Umaro'){
-        return { "name": "Umaro", "game": "Final Fantasy 6", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Umaro", "game": "Final Fantasy 6", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
 
       //////  Chrono Trigger //////////
 
       if(name == 'Crono'){
-        return { "name": "Crono", "game": "Chrono Trigger", "init": 0, "level": 1, "strength": 20, "pixelheight": 40, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Crono", "game": "Chrono Trigger", "init": 0, "level": 1, "pixelheight": 40, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Ayla'){
-        return { "name": "Ayla", "game": "Chrono Trigger", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Ayla", "game": "Chrono Trigger", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Frog'){
-        return { "name": "Frog", "game": "Chrono Trigger", "init": 0, "level": 1, "strength": 20, "pixelheight": 20, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Frog", "game": "Chrono Trigger", "init": 0, "level": 1, "pixelheight": 20, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Robo'){
-        return { "name": "Robo", "game": "Chrono Trigger", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Robo", "game": "Chrono Trigger", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Magus'){
-        return { "name": "Magus", "game": "Chrono Trigger", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Magus", "game": "Chrono Trigger", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Lucca'){
-        return { "name": "Lucca", "game": "Chrono Trigger", "init": 0, "level": 1, "strength": 20, "pixelheight": 40, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Lucca", "game": "Chrono Trigger", "init": 0, "level": 1, "pixelheight": 40, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Marle'){
-        return { "name": "Marle", "game": "Chrono Trigger", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Marle", "game": "Chrono Trigger", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
 
       ////////////// Secret of Mana //////////
 
       if(name == 'Randi'){
-        return { "name": "Randi", "game": "Secret of Mana", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Randi", "game": "Secret of Mana", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Popoi'){
-        return { "name": "Popoi", "game": "Secret of Mana", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Popoi", "game": "Secret of Mana", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Primm'){
-        return { "name": "Primm", "game": "Secret of Mana", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Primm", "game": "Secret of Mana", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
 
       //////////// Breath of Fire 2 /////////////
 
       if(name == 'Bleu'){
-        return { "name": "Bleu", "game": "Breath of Fire 2", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Bleu", "game": "Breath of Fire 2", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Bow'){
-        return { "name": "Bow", "game": "Breath of Fire 2", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Bow", "game": "Breath of Fire 2", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Jean'){
-        return { "name": "Jean", "game": "Breath of Fire 2", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Jean", "game": "Breath of Fire 2", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Katt'){
-        return { "name": "Katt", "game": "Breath of Fire 2", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Katt", "game": "Breath of Fire 2", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Nina'){
-        return { "name": "Nina", "game": "Breath of Fire 2", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Nina", "game": "Breath of Fire 2", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Rand'){
-        return { "name": "Rand", "game": "Breath of Fire 2", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Rand", "game": "Breath of Fire 2", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Ryu'){
-        return { "name": "Ryu", "game": "Breath of Fire 2", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Ryu", "game": "Breath of Fire 2", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Spar'){
-        return { "name": "Spar", "game": "Breath of Fire 2", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Spar", "game": "Breath of Fire 2", "init": 0, "level": 1, "pixelheight": 0, "position": "back", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
+
       if(name == 'Sten'){
-        return { "name": "Sten", "game": "Breath of Fire 2", "init": 0, "level": 1, "strength": 20, "pixelheight": 0, "mp": 10, "mptotal": 100, "speed": 30, "position": "front", "hp": 100, "hptotal": 160, "defending": false, "commands": ["Fight", "Defend", "Magic", "Runic"] }
+        return { "name": "Sten", "game": "Breath of Fire 2", "init": 0, "level": 1, "pixelheight": 0, "position": "front", "mp": $scope.calcMP(1, 30), "hp": 100,
+            "status": [{"defending": false}], "commands": ["Fight", "Defend", "Magic", "Runic"],
+            "equipment": ["", "", "", "", ""] 
+        }
       }
     }
 
@@ -245,6 +691,7 @@
         })
         if(noDupes){
           $scope.team.push($scope.returnCharacter(name));
+          //console.log($scope.returnCharacter(name))
         }
       }
       //console.log($scope.team);
@@ -398,7 +845,7 @@
         $scope.currentAITarget = '';
         loop();
         function loop() {
-            if ($scope.team[rando].hp < 0) {
+            if ($scope.team[rando].hp <= 0) {
               setTimeout(loop, 100);
             } else {
               // Found an applicable team target...
@@ -410,12 +857,24 @@
 
     function updateInitBoss(enemy, num){
       if($scope.enemyForce[num].init < 65536){
-        $scope.enemyForce[num].init += ((96 * ($scope.enemyForce[num].speed + 20)) / 16);
+        $scope.enemyForce[num].init += ((96 * ($scope.enemyForce[num].stats.speed + 20)) / 16);
       } else {
         pickTeamTarget(enemy, function() {
-            $scope.currentAITarget.hp -= 4;  ///  Put the code you want to actually work here....
+            
+            var hit = toHitEnemy(enemy, $scope.currentAITarget, "fight");
+            var dmg = toDmgEnemy(enemy, $scope.currentAITarget);
+
+            $scope.shownActionInit("Attack");
+
+            if(hit){
+              console.log(enemy.name + " hit for " + dmg)
+              $scope.changeHP($scope.currentAITarget, dmg);
+            } else {
+              console.log(enemy.name + " missed!")
+            }
+            
+            //$scope.currentAITarget.hp -= 100;  ///  Put the code you want to actually work here....
             $scope.enemyForce[num].init = 0;
-            console.log(enemy.name + " " +  num + " Attacks " + $scope.currentAITarget.name + " for 4 dmg");
         })
       }
     }
@@ -423,7 +882,7 @@
     function updateInit(char, num){
       var classStr = "." + $scope.team[num].name + "_status";
       if($scope.team[num].init < 65536){
-        $scope.team[num].init += ((96 * ($scope.team[num].speed + 20)) / 16)
+        $scope.team[num].init += ((96 * ($scope.team[num].stats.speed + 20)) / 16)
         $(classStr + ' .init').css('background-size', (($scope.team[num].init / 65536) * 100) + '% 10px' );
         //console.log(classStr + " " + (($scope.team[num].init / 65536) * 100) + '%');
       } else {
@@ -565,6 +1024,85 @@
 
     }
 
+    function toHit(status, char, target, ability, abilityType){
+
+      var blockValue = 0
+
+      if(abilityType == "Magic"){
+        blockValue = 255 - (target.stats.magic_evasion * 2) + 1
+      } else {
+        blockValue = 255 - (target.stats.evasion * 2) + 1
+      }
+      
+      var weaponToHit = $scope.getEquipment(char.equipment.left);
+
+      if((weaponToHit.hit_rate * blockValue / 256) > Math.floor(Math.random() * 99 + 1)){
+        return true
+      } else {
+        return false
+      }
+
+    }
+
+
+    function toHitEnemy(enemy, target, abilityType){
+
+      var blockValue = 0
+
+      if(abilityType == "Magic"){
+        blockValue = 255 - (target.stats.magic_evasion * 2) + 1
+      } else {
+        blockValue = 255 - (target.stats.evasion * 2) + 1
+      }
+      
+      if((enemy.stats.hit_rate * blockValue / 256) > Math.floor(Math.random() * 99 + 1)){
+        return true
+      } else {
+        return false
+      }
+
+    }
+
+    
+    function toDmg(status, char, target, ability){
+    
+      var strength2 = char.stats.strength * 2
+      var attack = char.stats.attack + $scope.getEquipment(char.equipment.left).power
+      var battlePower
+      var dmg
+
+      if(strength2 > 255){
+        strength2 = 255;
+      }
+
+      battlePower = strength2 + attack;
+
+      dmg = battlePower + ((char.level * char.level * attack) / 256) * 3 / 2
+      dmg = (dmg * (255 - target.stats.defense) / 256) + 1
+
+      if(char.position === "back"){
+        dmg = dmg / 2
+      }
+      return Math.floor(dmg)
+    }
+
+
+    function toDmgEnemy(enemy, target){
+
+      //  Physical Defense Only..  will need Magic Defense Eventually.
+      var targetDef = ($scope.getEquipment(target.equipment.left).defense || 0) + ($scope.getEquipment(target.equipment.right).defense || 0) + ($scope.getEquipment(target.equipment.helm).defense || 0) + ($scope.getEquipment(target.equipment.armor).defense || 0) + target.stats.defense
+      var dmg = enemy.level * enemy.level * (enemy.stats.attack * 4 + Math.floor(Math.random() * 63 + 56)) / 256
+
+      dmg = (dmg * (255 - targetDef) / 256) + 1
+
+      if(target.position === "back"){
+        dmg = dmg / 2
+      }
+      return Math.floor(dmg)
+    }
+
+
+
     function addToQueue(action, target, timer, char, ability){
 
       console.log(char.name + " prepares " + ability.name + " against " + target.name)
@@ -576,95 +1114,88 @@
       function doAction(){
 
         if(char.hp > 0){
+
           console.log(char.name + " casts " + ability.name + " against " + target.name)
 
-          shownAction(ability.name);
+          $scope.shownActionInit(ability.name);
           
 
           if(action === 'Fight'){
             // Actual formula should go here
-            target.hp -= char.strength;
+            var hit = toHit(status, char, target, ability, "");
+            var dmg = toDmg(status, char, target, ability);
+
+            if(hit){
+              console.log("You hit for " + dmg)
+              $scope.changeHP(target, dmg);
+            } else {
+              console.log("You missed!")
+            }
           }
 
+
           if(action === 'Magic'){
+
+            //  Show Casting Animation and Casting Sprite for Character
+            $('#' + char.name).append('<div class="magicCast"></div>')
             showAnim(char, 'cast' + char.name)  //  Casting Spell // Initiating Action Animations
-            target.hp -= ability.power;
+            
+            //Remove Casting Animation when it's done
             setTimeout(function(){
-              showAnim(char, 'goback' + char.name)
-            }, ability.animationTime)
+              $('.magicCast').remove();
+              
+              //When that's done, then have the spell go off...
+              $('#' + target.name + (target.num-1)).append('<div class="spell' + ability.name + '"></div>')
+
+              // Remove the spell animation once it's done.
+              setTimeout(function(){
+                $('.spell' + ability.name).remove();
+
+                // when it's done THEN do damage to the target
+                $scope.changeHP(target, ability.power);
+
+              }, ability.animationTime)
+
+            }, 1000)
+
           }
 
           if(action === 'Sing'){
-            target.hp -= ability.power;
+            $scope.changeHP(target, ability.power);
           }
-          if(target.hp < 0 ){
-            showAnim(target, 'deathBlow')
-          }
-
           
         }
-
         
-      }
-
-      function shownAction(name){
-        $scope.shownAction = name;
-        $scope.showAction = true;
-        setTimeout(function(){
-          $scope.shownAction = '';
-          $scope.showAction = false;
-        }, 2500)
       }
 
     }
 
+    $scope.shownActionInit = function(name){
+      $scope.shownAction = name;
+      $scope.showAction = true;
+      setTimeout(function(){
+        $scope.shownAction = '';
+        $scope.showAction = false;
+      }, 2500)
+    }
 
+    $scope.changeHP = function(target, dmg){
+      var targetID
+      target.hp -= dmg;
+      if(target.hp < 0 ){
+        targetID = "#" + target.name + (target.num - 1);
+        $(targetID).addClass('deathBlow')
+      }
+    }
 
     function showAnim(target, anim){
-      var targetID = '';
-      if (target.num) {
-        targetID = "#" + target.name + (target.num - 1);
-      } else {
-        targetID = "#" + target.name;
-      }
+      var targetID;
+      targetID = "#" + target.name;
       $(targetID).removeClass();
       $(targetID).addClass('character');
       $(targetID).addClass(target.name);
       $(targetID).addClass(anim);
     }
 
-    function magusAnim() {
-        if(anim_timer < 2){
-          anim_timer ++;
-        } else {
-          anim_timer = 1;
-        }
-        $('.magus').removeClass('ready_frame1');
-        $('.magus').removeClass('ready_frame2');
-        $('.magus').addClass('ready_frame' + anim_timer);
-    }
-
-    // var horizon = Horizon();
-    //   horizon.onReady(function() {
-    //     var heroes = horizon("heroes");
-    //     // var hero = { name: "Dark Knight Cecil"};
-    //     // heroes.store(hero)
-
-    //     heroes.fetch().subscribe(function (items) {
-    //       items.forEach(function (item) {
-    //         // Each result from the chat collection
-    //         //  will pass through this function
-    //         console.log(item);
-    //       });
-    //     },
-    //     // If an error occurs, this function
-    //     //  will execute with the `err` message
-    //     function (err) {
-    //       console.log(err);
-    //     });
-
-    //     //document.querySelector('h1').innerHTML = 'App works!'
-    //   });
-    // horizon.connect();
   }
 })();

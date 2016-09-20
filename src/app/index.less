@@ -150,25 +150,42 @@ body {
 	border: 3px solid;
 	border-color: @default-border-gradient;
 	padding: 1px;
-	height: 99%;
+	height: 820px;
 	margin: 2px; 
 	width: 70%;
 	float: left;
 }
 
-#optionsHolder {  
+#storeHolder {  
 	border-radius: 8px;
 	border: 3px solid;
 	border-color: @default-border-gradient;
 	padding: 1px;
+	height: 536px;
+	overflow-y: auto;
+	margin: 2px; 
+	width: 700px;
+	float: left;
+}
+
+.optionsHolder {  
+	border-radius: 8px;
+	border: 3px solid;
+	border-color: @default-border-gradient;
+	padding: 8px;
 	height: 99%;
 	margin: 2px; 
 	width: 26%;
 	float: left;
+	font-size: 20px;
 }
 
-.status { margin-bottom: 10px }
+.optionsHolder span { float: right }
+.optionsHolder italic { line-height: 32px; }
 
+.status { margin-bottom: 10px }
+.comparison { font-size: 14px; width: 100%; }
+.pointer { cursor: pointer; }
 
 #PartyScreen { padding: 5px }
 .statusBlock { width: 100%; padding: 10px; } 
@@ -180,6 +197,10 @@ body {
 .statusBlock .front { margin: 0px 70px 0px 0px; }
 .clear { clear: both }
 
+.itemBlock { width: 100%; padding: 5px 15px 5px 5px; }
+.onHover:hover { background-color: rgba(0,0,0,0.25); cursor: copy }
+.itemBlockHead { border-bottom: 3px solid #dedede;     background-color: rgba(0,0,0,0.25); }
+.desc, small { font-size: 14px;}
 
 #selectedCharacter { color: white; top: -1000px; z-index: 29; position: absolute; left: 0px; font-size: 40px; }
 #commands div:hover div::before { content: "› "}
@@ -195,18 +216,18 @@ body {
 }
 
 
-.Cecil { background: url(@sprite-ff4) 2385px 3952px; width: 73px; height: 100px; position: absolute; }
-.Rosa { background: url(@sprite-ff4) 2385px 3148px; width: 73px; height: 100px; position: absolute; }
-.Rydia { background: url(@sprite-ff4) 2385px 3500px; width: 73px; height: 100px; position: absolute; }
-.Cid { background: url(@sprite-ff4) 2385px 2692px; width: 73px; height: 100px; position: absolute; }
-.Edge { background: url(@sprite-ff4) 2385px 2576px; width: 73px; height: 100px; position: absolute; }
-.Edward { background: url(@sprite-ff4) 2385px 3268px; width: 73px; height: 100px; position: absolute; }
-.FuSoYa { background: url('../assets/images/FuSoYa.png') 0px 0px; width: 103px; height: 97px; position: absolute; }
-.Golbez { background: url(@sprite-ff4) 2385px 2340px; width: 73px; height: 100px; position: absolute; }
-.Kain { background: url(@sprite-ff4) 2385px 3728px; width: 73px; height: 100px; position: absolute; }
+.Cecil { background: url(../assets/images/Cecil.png) 0px 0px; width: 96px; height: 96px; position: absolute; }
+.Rosa { background: url(@sprite-ff4) 2385px 3148px; width: 96px; height: 96px; position: absolute; }
+.Rydia { background: url(@sprite-ff4) 2385px 3500px; width: 96px; height: 96px; position: absolute; }
+.Cid { background: url(../assets/images/Cid.png) 0px 0px; width: 96px; height: 96px; position: absolute; }
+.Edge { background: url(../assets/images/Edge.png) 0px 0px; width: 96px; height: 96px; position: absolute; }
+.Edward { background: url(../assets/images/Edward.png) 0px 0px; width: 96px; height: 96px; position: absolute; }
+.FuSoYa { background: url('../assets/images/FuSoYa.png') 0px 0px; width: 96px; height: 96px; position: absolute; }
+.Golbez { background: url(@sprite-ff4) 2385px 2340px; width: 96px; height: 96px; position: absolute; }
+.Kain { background: url(@sprite-ff4) 2385px 3728px; width: 96px; height: 96px; position: absolute; }
 .PalomPorom { background: url(@sprite-ff4) 2385px 2868px; width: 120px; height: 160px; position: absolute; }
-.Tellah { background: url(@sprite-ff4) 2385px 3392px; width: 73px; height: 100px; position: absolute; }
-.Yang { background: url(@sprite-ff4) 2385px 3032px; width: 73px; height: 100px; position: absolute; }
+.Tellah { background: url(@sprite-ff4) 2385px 3392px; width: 96px; height: 96px; position: absolute; }
+.Yang { background: url(@sprite-ff4) 2385px 3032px; width: 96px; height: 96px; position: absolute; }
 
 
 .Banon { background: url(@sprite-ff6) 320px 1950px; width: 80px; height: 100px; position: absolute; }
@@ -232,6 +253,20 @@ body {
 .Frog { background: url('../assets/images/FrogSprites.png') 1160px 2708px; width: 100px; height: 120px; position: absolute; transform: scaleX(-1); }
 .Lucca { background: url('../assets/images/LuccaSprites.png') 1448px 3016px; width: 88px; height: 140px; position: absolute; transform: scaleX(-1); }
 
+
+@keyframes magicCast {
+	from { background-position-x: 0px; }
+	to { background-position-x: -413px; }
+}
+
+.magicCast { animation: magicCast 1s steps(9); animation-fill-mode: none; background: url('../assets/images/spellcasting.png'); zoom: 4; height: 44px; width: 46px; opacity: 0.6; filter: saturate(4); filter: brightness(3); margin: -10px 0px 0px -14px; }
+
+@keyframes spellFire {
+	from { background-position-x: 924px; }
+	to { background-position-x: 866px; }
+}
+
+.spellFire { animation: spellFire 1s steps(2); animation-fill-mode: none; background: url('../assets/images/SNES - Final Fantasy 6 - Spell Effects 1.png') 924px 1128px; zoom: 4; height: 46px; width: 32px; margin: 0px; }
 
 @keyframes deathBlow {
     0%  {margin-left: -1px; opacity: 1; css-webkit-filter: hue-rotate(0deg);}
@@ -261,15 +296,15 @@ body {
 
 
 @keyframes castingFuSoYa {
-	from { background-position-x: -720px; }
-    to { background-position-x: -926px;  }
+	0% { background-position-x: -672px; }
+    100% { background-position-x: -864px; }
 }
 
-.castingFuSoYa { animation: castingFuSoYa .4s steps(2) infinite }
+.castingFuSoYa { animation: castingFuSoYa .3s steps(2) infinite }
 
 @keyframes castFuSoYa {
-	from { background-position-x: 1073px; }
-    to { background-position-x: 1073px;  }
+	from { background-position-x: -864px; }
+    to { background-position-x: -864px;  }
 }
 
 .castFuSoYa { animation: castFuSoYa 2s steps(1); animation-fill-mode: forward; }
@@ -284,24 +319,24 @@ body {
 
 
 @keyframes deadFuSoYa {
-	from { background-position-x: 973px; }
-    to { background-position-x: 762px;  }
+	from { background-position-x: -960px; }
+    to { background-position-x: -1152px;  }
 }
 @keyframes deadCecil {
-	from { background-position-x: 1778px; }
-    to { background-position-x: 1633px;  }
+	from { background-position-x: -768px; }
+    to { background-position-x: -960px;  }
 }
 @keyframes deadCid {
-	from { background-position-x: 1786px; }
-    to { background-position-x: 1641px;  }
+	from { background-position-x: -768px; }
+    to { background-position-x: -960px;  }
 }
 @keyframes deadEdge {
-	from { background-position-x: 1634px; }
-    to { background-position-x: 1492px;  }
+	from { background-position-x: -960px; }
+    to { background-position-x: -1152px;  }
 }
 @keyframes deadEdward {
-    from { background-position-x: 1788px; }
-    to { background-position-x: 1645px;  }
+    from { background-position-x: -768px; }
+    to { background-position-x: -960px;  }
 }
 
 
@@ -312,6 +347,47 @@ body {
 .deadFuSoYa { animation: deadFuSoYa .4s steps(2); animation-fill-mode: forwards; }
 
 
+
+.equipIcon { display: block; float: left; width: 32px; height: 32px; margin-right: 5px; }
+.hoverSelect:hover { border: 1px solid; border-color: @default-border-gradient; }
+
+
+.Claw { background: url('../assets/images/items2.png') -32px 0px; } 
+.Glove { background: url('../assets/images/items2.png') -128px -64px; } 
+.Dirk { background: url('../assets/images/items2.png') -32px -130px; } 
+.Dagger { background: url('../assets/images/items2.png') -64px -32px;  }
+.Sword { background: url('../assets/images/items2.png') -96px 0px; } 
+.Katana { background: url('../assets/images/items2.png') 0px -32px; } 
+.Mace { background: url('../assets/images/items2.png') -160px -193px; } 
+.Hammer { background: url('../assets/images/items2.png') -128px -96px; } 
+.Axe { background: url('../assets/images/items2.png') 0px 0px; } 
+.Spear { background: url('../assets/images/items2.png') -64px 0px; } 
+.Javelin { background: url('../assets/images/items2.png') -192px -64px; } 
+.Scythe { background: url('../assets/images/items2.png') -96px -64px; } 
+.Staff { background: url('../assets/images/items2.png') 0px -64px; } 
+.Rod { background: url('../assets/images/items2.png') -129px -129px; } 
+.Harp { background: url('../assets/images/items2.png') -384px -194px; } 
+.Whip { background: url('../assets/images/items2.png') -32px -96px; } 
+.Gun { background: url('../assets/images/items2.png') -32px -64px; } 
+.Bow { background: url('../assets/images/items2.png') -32px -32px; } 
+.Boomerang { background: url('../assets/images/items2.png') -64px -64px;} 
+.Ninja { background: url('../assets/images/items2.png') -96px -96px; }
+
+
+.Shield { background: url('../assets/images/items2.png') -320px -225px; }
+.HeavyShield { background: url('../assets/images/items2.png') -448px 0px; }
+.Helm { background: url('../assets/images/items2.png') -448px 0px; }
+.Hat { background: url('../assets/images/items2.png') -32px -288px; }
+.HeavyHelm { background: url('../assets/images/items2.png') 0px -288px; }
+.Robe { background: url('../assets/images/items2.png') -224px -320px; }
+.LightArmor { background: url('../assets/images/items2.png') -34px -448px; }
+.HeavyArmor { background: url('../assets/images/items2.png') -64px -480px; }
+.Relic { background: url('../assets/images/items2.png') -416px -64px; }
+
+.gil { background: url('../assets/images/items2.png') -288px -417px; } 
+
+.green { color:green }
+.red { color: red }
 
 
 /**
